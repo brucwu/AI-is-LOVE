@@ -18,6 +18,22 @@ Major modules:
 
 MCP can later be a standardized boundary to external services, but it should not become the fundamental interface between every internal subsystem.
 
+## MVP delivery platform
+
+The MVP user interface will be a **responsive Web App** rather than a native mobile application.
+
+Deployment target: **Render**.
+
+Initial deployment shape:
+
+- Web frontend: browser-based chat and development/debug UI
+- Backend: Python Character Runtime and API
+- Background worker: offline deliberation / proactive-message jobs
+- PostgreSQL: persistent character, relationship, memory, and conversation state
+- Render: hosting/deployment target for the MVP stack
+
+The web client should remain thin: authoritative character state and decisions live on the server. The UI can later evolve into a PWA or native client without replacing the Character Runtime.
+
 ## Character Runtime
 
 The Character Runtime is the authoritative persistent representation of a character.
