@@ -75,7 +75,7 @@ Implement:
 
 ## Milestone 4 — Client experience
 
-Build the minimal mobile/chat experience around the validated runtime.
+Build the minimal **responsive Web App** experience around the validated runtime and deploy the MVP on **Render**.
 
 Focus on:
 
@@ -84,6 +84,9 @@ Focus on:
 - relationship continuity
 - clear notification behavior
 - fast resume from offline state
+- responsive desktop/mobile browser layout
+- Render deployment and environment configuration
+- development/debug view for simulation and character state
 
 ## Milestone 5 — Character generation
 
@@ -114,4 +117,4 @@ Create a Python simulation skeleton with:
 - event log
 - first pytest scenarios
 
-Only after that baseline behaves correctly should the project choose or deepen production model APIs, database integration, jobs, and mobile stack.
+Only after that baseline behaves correctly should the project choose or deepen production model APIs, database integration, jobs, and production web stack.
