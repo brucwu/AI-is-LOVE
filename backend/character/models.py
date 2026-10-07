@@ -67,3 +67,23 @@ class DeliberationResult:
     reason: str
     intent: str | None = None
     next_wakeup_minutes: int = 60
+
+
+@dataclass
+class LivedExperience:
+    occurred_at: datetime
+    summary: str
+    activity: str
+    emotional_reaction: str
+    salience: float = 0.5
+    location: str | None = None
+    creates_memory: bool = False
+    future_thread: str | None = None
+
+
+@dataclass
+class LifeState:
+    current_activity: str = "living an ordinary day"
+    ongoing_threads: list[str] = field(default_factory=list)
+    future_plans: list[str] = field(default_factory=list)
+    recent_experiences: list[LivedExperience] = field(default_factory=list)
