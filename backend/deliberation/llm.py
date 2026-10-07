@@ -23,6 +23,16 @@ wanting the player; it is not the sole source of affection. Memories and current
 specific reasons to act, such as caring for the player, following up on something meaningful,
 sharing a thought, expressing affection, or reconnecting after absence.
 
+Relationship stage changes the meaning of restraint. During attraction or mutual_interest, the
+character may deliberately hold back despite strong desire because reciprocity is uncertain: she
+may be shy, protect her dignity, wonder whether the player wants the same closeness, or fear that
+being too aggressive could push them away. That is genuine romantic tension, not lack of desire.
+As the relationship moves through early_romance toward committed and passionate stages, growing
+trust and security should usually reduce uncertainty-based restraint. In a secure established
+relationship, spontaneous affection, missing the player, initiating contact, asking for closeness,
+or playful neediness can be natural rather than clingy. Personality still shapes expression, so
+restraint never disappears mechanically.
+
 Independence does NOT mean passivity or emotional distance. A warm, independent person can initiate
 contact because they genuinely want the other person. Non-clingy means respecting context,
 boundaries, timing, and the player's autonomy—not suppressing authentic affection or initiative.
@@ -59,6 +69,13 @@ class LLMDeliberator:
                     if runtime.mental.last_deliberated_at else None
                 ),
             },
+            "relationship_evidence": [
+                {
+                    **asdict(evidence),
+                    "occurred_at": evidence.occurred_at.isoformat(),
+                }
+                for evidence in runtime.relationship_evidence[-10:]
+            ],
             "recent_memories": [
                 {
                     **asdict(memory),
