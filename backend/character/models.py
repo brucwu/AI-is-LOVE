@@ -14,6 +14,8 @@ class CharacterProfile:
     name: str
     personality: str
     expression_style: str
+    affection: float = 0.85
+    desire_for_connection: float = 0.8
 
 
 @dataclass
