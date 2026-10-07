@@ -1,3 +1,6 @@
+import json
+import logging
+import os
 from datetime import datetime, timezone
 
 from fastapi import FastAPI
@@ -8,7 +11,8 @@ from backend.character.runtime import CharacterRuntime
 from backend.deliberation.llm import LLMDeliberator
 from backend.models.openai import OpenAIStructuredModel
 
-app = FastAPI(title="AI is LOVE", version="0.3.0")
+app = FastAPI(title="AI is LOVE", version="0.4.0")
+logger = logging.getLogger("ai_is_love.behavior")
 
 
 class DeliberationRequest(BaseModel):
@@ -54,24 +58,7 @@ def run_deliberation(request: DeliberationRequest) -> dict:
     }
 
 
-@app.get("/")
-def root() -> dict[str, str]:
-    return {"service": "AI is LOVE", "status": "ok"}
-
-
-@app.get("/health")
-def health() -> dict[str, str]:
-    return {"status": "ok"}
-
-
-@app.post("/deliberate")
-def deliberate(request: DeliberationRequest) -> dict:
-    return run_deliberation(request)
-
-
-@app.get("/experiments/behavior")
-@app.post("/experiments/behavior")
-def behavior_experiment() -> dict:
+def run_behavior_experiment() -> dict:
     scenarios = [
         ("quiet_baseline", DeliberationRequest(longing=0.15)),
         ("high_longing_only", DeliberationRequest(longing=0.9)),
@@ -110,4 +97,37 @@ def behavior_experiment() -> dict:
     results = []
     for name, request in scenarios:
         results.append({"scenario": name, **run_deliberation(request)})
-    return {"character": "Mira", "results": results}
+    payload = {"character": "Mira", "results": results}
+    logger.warning("BEHAVIOR_EXPERIMENT_RESULT %s", json.dumps(payload, ensure_ascii=False))
+    return payload
+
+
+@app.on_event("startup")
+def optional_startup_behavior_experiment() -> None:
+    if os.getenv("RUN_BEHAVIOR_EXPERIMENT_ON_STARTUP", "").lower() not in {"1", "true", "yes"}:
+        return
+    try:
+        run_behavior_experiment()
+    except Exception:
+        logger.exception("BEHAVIOR_EXPERIMENT_FAILED")
+
+
+@app.get("/")
+def root() -> dict[str, str]:
+    return {"service": "AI is LOVE", "status": "ok"}
+
+
+@app.get("/health")
+def health() -> dict[str, str]:
+    return {"status": "ok"}
+
+
+@app.post("/deliberate")
+def deliberate(request: DeliberationRequest) -> dict:
+    return run_deliberation(request)
+
+
+@app.get("/experiments/behavior")
+@app.post("/experiments/behavior")
+def behavior_experiment() -> dict:
+    return run_behavior_experiment()
