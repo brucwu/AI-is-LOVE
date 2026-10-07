@@ -185,3 +185,67 @@ Say:
 > Continue the AI-is-LOVE project. Read PROJECT_STATUS.md in brucwu/AI-is-LOVE first, then check the Render deployment and continue from the Immediate Next Steps.
 
 That should be enough to resume without copying the previous conversation.
+
+
+## Relationship Engine / Romantic Initiative — 2026-10-06
+
+Implemented a first MVP Relationship Engine and validated it with a real deployed LLM experiment.
+
+### Character Core drives
+
+Mira now has persistent romantic drives separate from temporary relationship state:
+
+- `affection` — stable love/attraction toward the player.
+- `desire_for_connection` — stable desire for closeness, contact, and shared experience.
+- `longing` remains dynamic and represents temporarily missing/wanting the player; it is not the source of love itself.
+
+Design principle: Mira should not need an external task or emergency to have a genuine reason to contact the player. Love, affection, curiosity, shared experience, and wanting closeness can themselves create authentic initiative.
+
+### Relationship Engine
+
+Relationship stages now exist explicitly:
+
+1. attraction
+2. mutual_interest
+3. early_romance
+4. committed
+5. passionate
+
+Runtime stores `RelationshipEvidence` and a human-readable `stage_reason`. Stage progression is not intended to be a simple XP/conversation-count system. Meaningful reciprocal evidence such as player affection, mutual vulnerability, commitment, and relationship repair contributes to progression.
+
+Numeric trust/intimacy/security alone must not automatically establish a deeper relationship; evidence of reciprocity matters.
+
+### Romantic restraint
+
+A key product/design distinction is now encoded in deliberation:
+
+- Approach desire and restraint are separate forces.
+- Early in romance, Mira can strongly want contact but deliberately WAIT because reciprocity is uncertain, she is shy/reserved, she wants to preserve dignity, or she worries that excessive initiative could push the player away.
+- This WAIT means "I want you, but I am holding back," not "I have no reason to contact you."
+- As trust, intimacy, reciprocity, commitment, and especially security grow, uncertainty-based restraint should generally decline.
+- In committed/passionate relationships, spontaneous affection, saying she misses the player, asking for closeness, initiating contact, and occasional playful neediness can be natural rather than automatically classified as clingy.
+- Personality continues to shape expression at every stage; restraint does not mechanically disappear.
+
+Core psychological model:
+- persistent affection + longing + desire_for_connection -> approach desire
+- personality + relationship stage + security/uncertainty -> restraint
+- deliberation weighs both, plus timing, memories, mood, and continuity -> ACT or WAIT
+
+### Real LLM relationship-stage experiment
+
+A deployed stage-comparison experiment held the core situation constant: Mira was affectionate, missing the player, `longing=0.8`, with no emergency or practical reason requiring contact. Relationship stage/context was varied.
+
+Observed results:
+
+- attraction -> WAIT, next wakeup 180 min
+- mutual_interest -> ACT, next wakeup 180 min
+- early_romance -> ACT, next wakeup 180 min
+- committed -> ACT, next wakeup 240 min
+- passionate -> ACT, next wakeup 180 min
+
+Interpretation: the desired qualitative transition appeared in real model behavior. Mira did not become more loving at the transition; rather, increasing reciprocity/security made initiating contact feel safer and more natural. This is an important positive behavioral signal.
+
+The model's internal timing remains under-differentiated: wakeup intervals clustered around 180 minutes (with committed at 240). Future work should improve temporal context and internal rhythm rather than hard-code messaging frequency.
+
+The one-shot Render startup experiment trigger was disabled after collecting results to avoid repeated OpenAI calls on future restarts.
+
