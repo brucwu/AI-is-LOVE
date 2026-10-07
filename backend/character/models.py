@@ -27,6 +27,35 @@ class CharacterProfile:
 
 
 @dataclass
+class LifePerson:
+    name: str
+    relationship: str
+    description: str
+
+
+@dataclass
+class LifeIdentity:
+    profession: str
+    profession_context: str
+    skills: list[str] = field(default_factory=list)
+    interests: list[str] = field(default_factory=list)
+    important_people: list[LifePerson] = field(default_factory=list)
+    long_term_goals: list[str] = field(default_factory=list)
+    responsibilities: list[str] = field(default_factory=list)
+
+
+@dataclass
+class LifeThread:
+    id: str
+    category: str
+    title: str
+    summary: str
+    status: str = "active"
+    importance: float = 0.5
+    last_progress_at: datetime | None = None
+
+
+@dataclass
 class RelationshipEvidence:
     kind: str
     description: str
@@ -79,11 +108,15 @@ class LivedExperience:
     location: str | None = None
     creates_memory: bool = False
     future_thread: str | None = None
+    thread_id: str | None = None
+    thread_progress: str | None = None
 
 
 @dataclass
 class LifeState:
     current_activity: str = "living an ordinary day"
+    identity: LifeIdentity | None = None
+    threads: list[LifeThread] = field(default_factory=list)
     ongoing_threads: list[str] = field(default_factory=list)
     future_plans: list[str] = field(default_factory=list)
     recent_experiences: list[LivedExperience] = field(default_factory=list)
