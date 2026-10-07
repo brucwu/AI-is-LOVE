@@ -10,6 +10,7 @@ from backend.character.models import CharacterProfile, Memory, RelationshipStage
 from backend.character.runtime import CharacterRuntime
 from backend.deliberation.llm import LLMDeliberator
 from backend.models.openai import OpenAIStructuredModel
+from backend.life.director import LLMLifeDirector
 
 app = FastAPI(title="AI is LOVE", version="0.4.0")
 logger = logging.getLogger("ai_is_love.behavior")
@@ -169,3 +170,24 @@ def behavior_experiment() -> dict:
 @app.post("/experiments/stages")
 def stage_experiment() -> dict:
     return run_stage_experiment()
+
+
+def run_life_simulation(days: int = 7, slice_hours: int = 6) -> dict:
+    runtime = CharacterRuntime(profile=CharacterProfile(id="development-character", name="Mira", personality="warm, independent, emotionally attentive", expression_style="natural, affectionate, not clingy"))
+    director = LLMLifeDirector(OpenAIStructuredModel())
+    now = datetime.now(timezone.utc)
+    events = []
+    for step in range(days * 24 // slice_hours):
+        event_time = now + __import__("datetime").timedelta(hours=step * slice_hours)
+        event = director.advance(runtime, event_time)
+        runtime.experience(event)
+        events.append({"occurred_at": event.occurred_at.isoformat(), "activity": event.activity, "summary": event.summary, "emotional_reaction": event.emotional_reaction, "salience": event.salience, "creates_memory": event.creates_memory, "future_thread": event.future_thread})
+    payload = {"character":"Mira","experiment":"seven_days_without_player","days":days,"slice_hours":slice_hours,"events":events,"memories_created":len(runtime.memories),"ongoing_threads":runtime.life.ongoing_threads}
+    logger.warning("LIFE_SIMULATION_RESULT %s", json.dumps(payload, ensure_ascii=False))
+    return payload
+
+
+@app.get("/experiments/life")
+@app.post("/experiments/life")
+def life_experiment() -> dict:
+    return run_life_simulation()
