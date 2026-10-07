@@ -4,6 +4,7 @@ from datetime import datetime
 from backend.character.models import (
     CharacterProfile,
     LifeState,
+    LifeThread,
     LivedExperience,
     Memory,
     MentalState,
@@ -23,7 +24,6 @@ class CharacterRuntime:
     life: LifeState = field(default_factory=LifeState)
 
     def advance_internal_time(self, now: datetime, elapsed_hours: float) -> None:
-        # Absence can increase longing without forcing action.
         self.relationship.longing = min(1.0, self.relationship.longing + 0.08 * elapsed_hours)
         self.mental.last_deliberated_at = now
 
@@ -34,8 +34,18 @@ class CharacterRuntime:
         self.life.current_activity = event.activity
         self.life.recent_experiences.append(event)
         self.life.recent_experiences = self.life.recent_experiences[-30:]
+
+        if event.thread_id:
+            thread = next((t for t in self.life.threads if t.id == event.thread_id), None)
+            if thread:
+                if event.thread_progress:
+                    thread.summary = event.thread_progress
+                thread.last_progress_at = event.occurred_at
+
+        # Legacy bridge while older simulations/fixtures still use free-text threads.
         if event.future_thread and event.future_thread not in self.life.ongoing_threads:
             self.life.ongoing_threads.append(event.future_thread)
+
         if event.creates_memory:
             self.remember(Memory(
                 content=event.summary,
@@ -44,28 +54,26 @@ class CharacterRuntime:
                 emotional_weight=min(1.0, max(-1.0, event.salience)),
             ))
 
+    def add_life_thread(self, thread: LifeThread) -> None:
+        if not any(existing.id == thread.id for existing in self.life.threads):
+            self.life.threads.append(thread)
+
     def record_relationship_evidence(self, evidence: RelationshipEvidence) -> None:
         self.relationship_evidence.append(evidence)
         self._reassess_relationship_stage()
 
     def _reassess_relationship_stage(self) -> None:
-        positive = sum(
-            max(0.0, e.valence) * e.significance for e in self.relationship_evidence[-30:]
-        )
+        positive = sum(max(0.0, e.valence) * e.significance for e in self.relationship_evidence[-30:])
         reciprocal = sum(
-            e.significance
-            for e in self.relationship_evidence[-30:]
-            if e.kind in {"player_affection", "mutual_vulnerability", "commitment", "repair"}
-            and e.valence > 0
+            e.significance for e in self.relationship_evidence[-30:]
+            if e.kind in {"player_affection", "mutual_vulnerability", "commitment", "repair"} and e.valence > 0
         )
         commitment = sum(
-            e.significance
-            for e in self.relationship_evidence[-30:]
+            e.significance for e in self.relationship_evidence[-30:]
             if e.kind == "commitment" and e.valence > 0
         )
 
         r = self.relationship
-        # MVP transition policy: evidence is necessary, so numeric state alone cannot level up.
         if commitment >= 1.0 and r.trust >= 0.75 and r.intimacy >= 0.7 and r.security >= 0.7:
             r.stage = RelationshipStage.PASSIONATE
             r.stage_reason = "Strong mutual commitment plus high trust, intimacy, and security."
