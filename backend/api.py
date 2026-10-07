@@ -4,8 +4,10 @@ import os
 from dataclasses import asdict
 from datetime import datetime, timedelta, timezone
 from zoneinfo import ZoneInfo
+import secrets
+from uuid import uuid4
 
-from fastapi import FastAPI
+from fastapi import FastAPI, Header, HTTPException, Depends
 from pydantic import BaseModel, Field
 
 from backend.character.models import CharacterProfile, LifeState, Memory, RelationshipStage, RelationshipState
@@ -14,9 +16,60 @@ from backend.deliberation.llm import LLMDeliberator
 from backend.models.openai import OpenAIStructuredModel
 from backend.life.director import LLMLifeDirector, serialize_experience, serialize_thread
 from backend.life.mira import mira_life_identity, mira_initial_threads
+from backend.persistence.service import initialize_database
+from backend.persistence.store import RuntimeStore, ConflictError, encode
 
 app = FastAPI(title="AI is LOVE", version="0.5.1")
 logger = logging.getLogger("ai_is_love.behavior")
+PROCESS_ID = str(uuid4())
+
+
+@app.on_event("startup")
+def initialize_persistent_runtime():
+    url = os.getenv("DATABASE_URL")
+    app.state.persistence = initialize_database(url) if url else None
+    if url:
+        logger.warning("PERSISTENCE_VALIDATION %s", json.dumps(
+            {**app.state.persistence, "process_id": PROCESS_ID,
+             "commit_sha": os.getenv("RENDER_GIT_COMMIT")}, ensure_ascii=False))
+
+
+def authorize_runtime(authorization: str | None = Header(default=None)):
+    token = os.getenv("RUNTIME_API_TOKEN")
+    if not token or not os.getenv("DATABASE_URL"):
+        raise HTTPException(503, "Persistent runtime access is not configured")
+    if not secrets.compare_digest(authorization or "", "Bearer " + token):
+        raise HTTPException(401, "Unauthorized")
+
+
+@app.get("/runtime/mira", dependencies=[Depends(authorize_runtime)])
+def persistent_mira():
+    store = RuntimeStore(os.environ["DATABASE_URL"])
+    try:
+        runtime, revision = store.load("mira")
+        if runtime is None:
+            raise HTTPException(404, "Character not found")
+        return {"revision": revision, "runtime": encode(runtime)}
+    finally:
+        store.close()
+
+
+@app.post("/runtime/mira/life", dependencies=[Depends(authorize_runtime)])
+def advance_persistent_life():
+    store = RuntimeStore(os.environ["DATABASE_URL"])
+    try:
+        runtime, revision = store.load("mira")
+        if runtime is None:
+            raise HTTPException(404, "Character not found")
+        event = runtime.experience(LLMLifeDirector(OpenAIStructuredModel()).advance(
+            runtime, datetime.now(timezone.utc)))
+        try:
+            revision = store.save(runtime, revision)
+        except ConflictError:
+            raise HTTPException(409, "Character changed; reload before retrying")
+        return {"revision": revision, "event": serialize_experience(event)}
+    finally:
+        store.close()
 
 
 class DeliberationRequest(BaseModel):
@@ -155,7 +208,8 @@ def root() -> dict[str, str]:
 
 @app.get("/health")
 def health() -> dict[str, str]:
-    return {"status": "ok"}
+    return {"status": "ok", "process_id": PROCESS_ID,
+            "persistence": "ready" if getattr(app.state, "persistence", None) else "disabled"}
 
 
 @app.post("/deliberate")
@@ -210,3 +264,4 @@ def run_life_simulation(days: int = 7, slice_hours: int = 6) -> dict:
 @app.post("/experiments/life")
 def life_experiment() -> dict:
     return run_life_simulation()
+
