@@ -248,3 +248,39 @@ pyproject.toml
 ```
 
 This is a logical boundary proposal; directories should be created when code needs them rather than as empty scaffolding.
+
+
+## World Grounding and Life Director
+
+Add two conceptual modules upstream of Memory and Deliberation.
+
+### World Grounding
+
+World Grounding retrieves and normalizes selected real-world context that can anchor Mira's life: local places and restaurants, menus where available, landmarks, events, weather, and current news. Output retains source/provenance, retrieval time, time/location relevance, and verified-fact versus inference boundaries. Grounding is reference material, not evidence that Mira experienced something.
+
+Retrieval should be selective and driven by Mira's context, interests, plans, ongoing life threads, and meaningful events rather than continuously dumping search results into prompts.
+
+### Life Director
+
+The Life Director advances Mira's off-screen life and proposes structured LivedExperience events. It is a separate cognition responsibility from romantic deliberation and expression, even if the MVP reuses the same underlying model provider.
+
+A LivedExperience can contain time/duration, activity/event, location reference, social context, emotional reaction, salience, resulting plans or unresolved threads, candidate memory, grounding references, and provenance boundaries.
+
+The Character Runtime remains authoritative. The model proposes experiences; runtime validates chronology, continuity, grounding references, and allowed state changes before persistence.
+
+### Life continuity
+
+Persist future plans, hobbies/projects/work concerns, recurring places and people, unresolved personal situations, recent experiences, and emotional residue. Yesterday's intention can cause today's activity, and today's experience can influence tomorrow.
+
+### Background flow
+
+1. Scheduler creates an opportunity to advance life.
+2. Runtime loads life state and selectively obtains World Grounding.
+3. Life Director proposes zero or more lived events.
+4. Runtime validates and persists experiences, memories, mental-state changes, and future threads.
+5. Separately, romantic deliberation sees relevant lived experience plus relationship context and chooses ACT or WAIT.
+6. If ACT, Expression turns the selected intent into character-consistent communication.
+
+A life event must not automatically trigger a player message.
+
+Life Director may use a separate LLM call/model role from Mira's deliberation. Keep the architectural boundary even if both initially use the same provider/model so capability, cost, cadence, and prompts can evolve independently.
