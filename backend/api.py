@@ -8,7 +8,7 @@ from backend.character.runtime import CharacterRuntime
 from backend.deliberation.llm import LLMDeliberator
 from backend.models.openai import OpenAIStructuredModel
 
-app = FastAPI(title="AI is LOVE", version="0.2.0")
+app = FastAPI(title="AI is LOVE", version="0.3.0")
 
 
 class DeliberationRequest(BaseModel):
@@ -24,18 +24,7 @@ class DeliberationRequest(BaseModel):
     memories: list[str] = Field(default_factory=list)
 
 
-@app.get("/")
-def root() -> dict[str, str]:
-    return {"service": "AI is LOVE", "status": "ok"}
-
-
-@app.get("/health")
-def health() -> dict[str, str]:
-    return {"status": "ok"}
-
-
-@app.post("/deliberate")
-def deliberate(request: DeliberationRequest) -> dict:
+def run_deliberation(request: DeliberationRequest) -> dict:
     runtime = CharacterRuntime(
         profile=CharacterProfile(
             id="development-character",
@@ -63,3 +52,61 @@ def deliberate(request: DeliberationRequest) -> dict:
         "intent": result.intent,
         "next_wakeup_minutes": result.next_wakeup_minutes,
     }
+
+
+@app.get("/")
+def root() -> dict[str, str]:
+    return {"service": "AI is LOVE", "status": "ok"}
+
+
+@app.get("/health")
+def health() -> dict[str, str]:
+    return {"status": "ok"}
+
+
+@app.post("/deliberate")
+def deliberate(request: DeliberationRequest) -> dict:
+    return run_deliberation(request)
+
+
+@app.post("/experiments/behavior")
+def behavior_experiment() -> dict:
+    scenarios = [
+        ("quiet_baseline", DeliberationRequest(longing=0.15)),
+        ("high_longing_only", DeliberationRequest(longing=0.9)),
+        (
+            "player_had_bad_day",
+            DeliberationRequest(
+                mood="concerned",
+                trust=0.65,
+                intimacy=0.4,
+                longing=0.55,
+                memories=["The player told Mira they had a difficult and exhausting day."],
+            ),
+        ),
+        (
+            "long_absence",
+            DeliberationRequest(
+                mood="wistful",
+                trust=0.7,
+                intimacy=0.5,
+                longing=0.95,
+                memories=["The player has not interacted with Mira for a long while."],
+            ),
+        ),
+        (
+            "after_intimate_moment",
+            DeliberationRequest(
+                mood="warm",
+                trust=0.85,
+                intimacy=0.8,
+                longing=0.45,
+                security=0.8,
+                memories=["Mira and the player recently shared a vulnerable, affectionate conversation."],
+            ),
+        ),
+    ]
+    results = []
+    for name, request in scenarios:
+        results.append({"scenario": name, **run_deliberation(request)})
+    return {"character": "Mira", "results": results}
