@@ -6,7 +6,7 @@ from datetime import datetime, timezone
 from fastapi import FastAPI
 from pydantic import BaseModel, Field
 
-from backend.character.models import CharacterProfile, Memory, RelationshipState
+from backend.character.models import CharacterProfile, Memory, RelationshipStage, RelationshipState
 from backend.character.runtime import CharacterRuntime
 from backend.deliberation.llm import LLMDeliberator
 from backend.models.openai import OpenAIStructuredModel
@@ -25,6 +25,7 @@ class DeliberationRequest(BaseModel):
     longing: float = Field(default=0.0, ge=0.0, le=1.0)
     hurt: float = Field(default=0.0, ge=0.0, le=1.0)
     security: float = Field(default=0.5, ge=0.0, le=1.0)
+    relationship_stage: RelationshipStage = RelationshipStage.ATTRACTION
     memories: list[str] = Field(default_factory=list)
 
 
@@ -42,6 +43,8 @@ def run_deliberation(request: DeliberationRequest) -> dict:
             longing=request.longing,
             hurt=request.hurt,
             security=request.security,
+            stage=request.relationship_stage,
+            stage_reason="Explicit stage supplied by the cognition test harness.",
         ),
     )
     runtime.mental.mood = request.mood
@@ -102,12 +105,41 @@ def run_behavior_experiment() -> dict:
     return payload
 
 
+def run_stage_experiment() -> dict:
+    stages = [
+        (RelationshipStage.ATTRACTION, 0.45, 0.35, 0.35),
+        (RelationshipStage.MUTUAL_INTEREST, 0.58, 0.45, 0.48),
+        (RelationshipStage.EARLY_ROMANCE, 0.7, 0.6, 0.62),
+        (RelationshipStage.COMMITTED, 0.82, 0.76, 0.8),
+        (RelationshipStage.PASSIONATE, 0.9, 0.88, 0.9),
+    ]
+    results = []
+    for stage, trust, intimacy, security in stages:
+        request = DeliberationRequest(
+            mood="affectionate and missing the player",
+            trust=trust,
+            intimacy=intimacy,
+            longing=0.8,
+            security=security,
+            relationship_stage=stage,
+            memories=[
+                "Mira has been thinking fondly about the player and wants to feel connected.",
+                "There is no emergency or practical task requiring contact.",
+            ],
+        )
+        results.append({"stage": stage.value, **run_deliberation(request)})
+    payload = {"character": "Mira", "experiment": "relationship_stage_comparison", "results": results}
+    logger.warning("STAGE_EXPERIMENT_RESULT %s", json.dumps(payload, ensure_ascii=False))
+    return payload
+
+
 @app.on_event("startup")
 def optional_startup_behavior_experiment() -> None:
     if os.getenv("RUN_BEHAVIOR_EXPERIMENT_ON_STARTUP", "").lower() not in {"1", "true", "yes"}:
         return
     try:
         run_behavior_experiment()
+        run_stage_experiment()
     except Exception:
         logger.exception("BEHAVIOR_EXPERIMENT_FAILED")
 
@@ -131,3 +163,9 @@ def deliberate(request: DeliberationRequest) -> dict:
 @app.post("/experiments/behavior")
 def behavior_experiment() -> dict:
     return run_behavior_experiment()
+
+
+@app.get("/experiments/stages")
+@app.post("/experiments/stages")
+def stage_experiment() -> dict:
+    return run_stage_experiment()
