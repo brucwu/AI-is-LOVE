@@ -131,3 +131,36 @@ def test_life_api_runs_28_slices_with_persistent_runtime(monkeypatch, method):
     times = [datetime.fromisoformat(e["occurred_at"]) for e in body["events"]]
     assert all(b - a == timedelta(hours=6) for a, b in zip(times, times[1:]))
     assert all(c["payload"]["life_identity"]["profession"] == "wildlife rescue veterinarian" for c in models[0].calls)
+
+
+def test_pending_checkpoint_persists_and_reaches_next_director_call():
+    rt = runtime()
+    rt.experience(event(thread_next_step="Review independent feeding with Jules", thread_next_step_in_hours=24))
+    assert rt.life.threads[0].next_step == "Review independent feeding with Jules"
+    assert rt.life.threads[0].next_check_at == NOW + timedelta(hours=24)
+    model = RecordingModel()
+    LLMLifeDirector(model).advance(rt, NOW + timedelta(hours=24))
+    thread = model.calls[0]["payload"]["active_life_threads"][0]
+    assert thread["next_check_at"] == (NOW + timedelta(hours=24)).isoformat()
+    # A completed checkpoint can clear its pending plan, without changing thread status.
+    rt.experience(event(occurred_at=NOW + timedelta(hours=24)))
+    assert rt.life.threads[0].next_step is None
+    assert rt.life.threads[0].next_check_at is None
+    assert rt.life.threads[0].status == "active"
+
+
+@pytest.mark.parametrize("hours", [-1, 0, 169, True, "24"])
+def test_invalid_checkpoint_does_not_replace_existing_plan(hours):
+    rt = runtime()
+    rt.experience(event(thread_next_step="Review feeding", thread_next_step_in_hours=24))
+    rt.experience(event(thread_next_step="Injected plan", thread_next_step_in_hours=hours))
+    assert rt.life.threads[0].next_step == "Review feeding"
+    assert rt.life.threads[0].next_check_at == NOW + timedelta(hours=24)
+
+
+def test_unknown_thread_cannot_install_checkpoint():
+    rt = runtime()
+    before = [asdict(t) for t in rt.life.threads]
+    applied = rt.experience(event(thread_id="invented", thread_next_step="Overwrite life", thread_next_step_in_hours=24))
+    assert [asdict(t) for t in rt.life.threads] == before
+    assert applied.thread_next_step is None

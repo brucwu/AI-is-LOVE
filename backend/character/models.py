@@ -53,6 +53,8 @@ class LifeThread:
     status: str = "active"
     importance: float = 0.5
     last_progress_at: datetime | None = None
+    next_step: str | None = None
+    next_check_at: datetime | None = None
 
 
 @dataclass
@@ -110,6 +112,8 @@ class LivedExperience:
     future_thread: str | None = None
     thread_id: str | None = None
     thread_progress: str | None = None
+    thread_next_step: str | None = None
+    thread_next_step_in_hours: int | None = None
     category: str = "personal"
     participants: list[str] = field(default_factory=list)
 

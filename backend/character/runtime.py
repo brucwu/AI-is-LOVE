@@ -1,5 +1,5 @@
 from dataclasses import dataclass, field, replace
-from datetime import datetime
+from datetime import datetime, timedelta
 
 from backend.character.models import (
     CharacterProfile,
@@ -42,9 +42,23 @@ class CharacterRuntime:
         if thread is not None and progress and len(progress) <= 2000:
             thread.summary = progress
             thread.last_progress_at = event.occurred_at
-            event = replace(event, thread_progress=progress)
+            next_step = event.thread_next_step
+            hours = event.thread_next_step_in_hours
+            if next_step is None and hours is None:
+                thread.next_step = None
+                thread.next_check_at = None
+            elif (isinstance(next_step, str) and next_step.strip() and len(next_step) <= 500
+                  and type(hours) is int and 6 <= hours <= 168):
+                thread.next_step = next_step.strip()
+                thread.next_check_at = event.occurred_at + timedelta(hours=hours)
+            else:
+                next_step = None
+                hours = None
+            event = replace(event, thread_progress=progress,
+                            thread_next_step=next_step, thread_next_step_in_hours=hours)
         else:
-            event = replace(event, thread_id=None, thread_progress=None)
+            event = replace(event, thread_id=None, thread_progress=None,
+                            thread_next_step=None, thread_next_step_in_hours=None)
 
         self.life.current_activity = event.activity
         self.mental.mood = event.emotional_reaction

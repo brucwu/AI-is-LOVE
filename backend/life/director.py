@@ -18,17 +18,22 @@ LIFE_SCHEMA = {
         "creates_memory": {"type": "boolean"},
         "thread_id": {"type": ["string", "null"]},
         "thread_progress": {"type": ["string", "null"]},
+        "thread_next_step": {"type": ["string", "null"]},
+        "thread_next_step_in_hours": {"type": ["integer", "null"], "minimum": 6, "maximum": 168},
     },
     "required": ["activity", "category", "summary", "emotional_reaction", "salience",
-                 "location", "participants", "creates_memory", "thread_id", "thread_progress"],
+                 "location", "participants", "creates_memory", "thread_id", "thread_progress",
+                 "thread_next_step", "thread_next_step_in_hours"],
     "additionalProperties": False,
 }
 
 SYSTEM_PROMPT = """You are Life Director v1 for a persistent fictional character. She exists and lives even when the player is absent. Generate one representative experience in the elapsed slice, not a six-hour continuous task or a message to the player.
 
-Use the supplied Life Identity: profession, responsibilities, important people, interests and long-term goals. Usually advance ONE existing active Life Thread when appropriate. Select its exact id; thread_progress is a concise cumulative state of that thread AFTER this experience, retaining unresolved concerns, specific people, commitments and future timing. Preserve established facts; do not reset a case, forget an agreement or repeat a completed task. The Runtime alone applies validated progression; you cannot create threads or rewrite identity/status/importance. An ordinary unthreaded event (especially rest) is fine: return null for both thread fields.
+Use the supplied Life Identity: profession, responsibilities, important people, interests and long-term goals. Usually advance ONE existing active Life Thread when appropriate. Select its exact id; thread_progress is a concise cumulative state of that thread AFTER this experience, retaining unresolved concerns, specific people, commitments and future timing. Preserve established facts; do not reset a case, forget an agreement or repeat a completed task. The Runtime alone applies validated progression; you cannot create threads or rewrite identity/status/importance. An ordinary unthreaded event (especially rest) is fine: return null for all thread fields.
 
-Use recent experiences, memories, mental state and local temporal context causally. Plans made earlier should lead to preparation, actual meetings/events and later consequences when their time arrives. Do not repeatedly defer or endlessly refine a plan. Existing animals remain the same fictional cases across follow-ups; rehabilitation/release must take plausible time and involve appropriate clinical assessment, not miraculous recovery. Coworkers and friends have distinct roles and their own constraints. Do not turn every interaction into a therapeutic pep talk.
+For a progressed thread with a concrete unfinished commitment, return thread_next_step (one specific actionable checkpoint) and thread_next_step_in_hours (6-168 hours after this slice). Both are null if there is no pending checkpoint. These are plans, not guarantees. Before choosing a new experience, inspect existing next_step/next_check_at: due commitments deserve follow-through in a plausible waking/off-duty/work slot. If a checkpoint is deferred, explain a NEW concrete constraint and retain that concern; do not repeatedly roll the same unchanged plan forward. A social plan should sometimes name an activity and day and actually happen later. A photography project should sometimes move from taking pictures to choosing a theme, making a small series or sharing it with someone, not always collecting more material.
+
+Use recent experiences, memories, mental state and local temporal context causally. Plans made earlier should lead to preparation, actual meetings/events and later consequences when their time arrives. Do not repeatedly defer or endlessly refine a plan. Existing animals remain the same fictional cases across follow-ups; rehabilitation/release must take plausible time and involve appropriate clinical assessment, not miraculous recovery. Wildlife should retain appropriate wariness of humans: tolerance of handling is NOT a release criterion. Use species/age-appropriate independent feeding, mobility/flight, body condition, healing and suitability for release; avoid unnecessary repeated handling. A stable case needs a concrete clinical reassessment or rehabilitation milestone, not an indefinite daily "one more day" because it is wary. Cases can resolve or move into staff-led longer rehabilitation; do not invent complications to keep a case open. Coworkers and friends have distinct roles and their own constraints. Do not turn every interaction into a therapeutic pep talk.
 
 Mostly ordinary believable life, some meaningful/share-worthy experiences, very few exceptional events. Work should be present on plausible shifts, with follow-ups and colleagues, but not consume all hours or all days. Protect off-duty life, social contact, outdoor interests and rest. At night sleep/rest is normal, not recurring midnight chores or routine center visits. There is no established work roster yet: infer modest shifts consistently from recent history, allow days off, and do not claim a real schedule. Consider recent category counts and streaks: avoid consecutive slices dominated by the same category unless a specific obligation or ongoing event justifies it. This is context for judgment, not a category rotation quota. A broad personal-life thread is not an excuse for repetitive apartment organizing, receipts, kitchen chores or tea. Interests can involve going out and doing things, not only planning them.
 
@@ -40,7 +45,9 @@ def serialize_experience(event):
 
 
 def serialize_thread(thread):
-    return {**asdict(thread), "last_progress_at": thread.last_progress_at.isoformat() if thread.last_progress_at else None}
+    return {**asdict(thread),
+            "last_progress_at": thread.last_progress_at.isoformat() if thread.last_progress_at else None,
+            "next_check_at": thread.next_check_at.isoformat() if thread.next_check_at else None}
 
 
 class LLMLifeDirector:
@@ -87,4 +94,5 @@ class LLMLifeDirector:
             summary=raw["summary"].strip(), emotional_reaction=raw["emotional_reaction"].strip(),
             salience=float(raw["salience"]), location=raw["location"], participants=raw["participants"],
             creates_memory=raw["creates_memory"], thread_id=raw["thread_id"], thread_progress=raw["thread_progress"],
+            thread_next_step=raw["thread_next_step"], thread_next_step_in_hours=raw["thread_next_step_in_hours"],
         )
