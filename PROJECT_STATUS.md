@@ -502,3 +502,19 @@ First persistence stage implemented on feature/runtime-persistence; not connecte
 - Executed full suite: 32 passed, two existing startup deprecation warnings. Restart test closes/reopens database connections twice and verifies full equality plus further memory saving. Two independent connections exercise stale-write rejection.
 - Render workspace inspection found no Postgres instances. No database was provisioned or billed; no secrets retrieved. Production PostgreSQL integration, authenticated persistent API, deployment and actual service-restart test remain outstanding. Existing experiment APIs remain stateless and isolated.
 - Next: choose Render database plan, configure DATABASE_URL without exposing credentials, connect a protected runtime service, verify PostgreSQL transactions and real deployment restart. Autonomous background loop follows durable state verification.
+
+
+## PostgreSQL deployment and real process restore — 2026-10-07
+
+PR #2 merged (01d12bd); runtime integration and subsequent PostgreSQL transaction fix (2af16f7) are on main. DATABASE_URL is now populated with the actual internal URL in Render; earlier copy/fill attempts saved an empty value, detected and corrected before claiming database success. No connection secrets were put in source or this report.
+
+- Free Postgres ai-is-love-runtime-validation is Available in Oregon; expires November 6, 2026. External connections remain blocked.
+- Startup initializes persistent Mira and validates a separate deterministic character snapshot. Fixture includes Traditional Chinese memories, committed relationship, life identity/threads, unresolved intention and Nina's next-day appointment.
+- Real PostgreSQL first startup: 2026-10-07T22:23:55.782Z, process 6c327fee-30b2-4b82-9122-2f0ad0d85a21, commit 2af16f7, restored_from_previous_process=false.
+- Subsequent deployment startup: 2026-10-07T22:24:46.880Z, process 94b956c4-af52-4bf4-a7b8-eb7b5a9ce3ce, commit 8f7dde0, restored_from_previous_process=true.
+- Both fixture SHA256 values: 996126bad6cd893281eaee73586ddee81fe26377bb7905a64b48d7958b075b59. Fixture and persistent Mira revisions both 1. This confirms a complete deterministic snapshot survived a real process replacement; it is not a fresh LLM-generated multi-day scenario.
+- Current full retrieved test suite: 35 passed, 4 FastAPI startup deprecation warnings. Added tests cover API access rejection, repeated startup restoration and exact runtime equality; original stale-writer tests still pass.
+- Fixed psycopg connection lifecycle: use connection.transaction(), because psycopg connection context closes the connection on exit.
+- GET /runtime/mira and POST /runtime/mira/life are wired to durable storage and protected by RUNTIME_API_TOKEN. Token has NOT yet been provisioned; these endpoints intentionally return 503 until configured. Their live authenticated use and LLM life mutation remain untested. Existing /experiments endpoints remain stateless.
+- No autonomous scheduler/background life loop has been added. Next: provision runtime authentication, validate one authorized life advance plus restore, then implement the cost-aware wake-up loop on the chosen hosting plan.
+- Direct browser access to the public app was blocked by client network policy; health success and process restore were verified through Render deploy metadata and application logs. Read-only SQL MCP cannot connect because external database traffic is disabled; private app connection succeeded, without loosening network access.
