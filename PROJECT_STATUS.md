@@ -2,6 +2,8 @@
 
 _Last updated: 2026-10-07_
 
+**Current checkpoint: Life Director v1 is implemented, tested, deployed and exercised in two real seven-day / 28-slice runs.** Read **Life Director v1 Completed Checkpoint** at the end for current results and next steps. Earlier sections preserve historical snapshots; their old immediate-next-step instructions are superseded by this completed checkpoint. Persistence across restarts and an autonomous background life loop are still not implemented.
+
 This file is the canonical handoff checkpoint for continuing the project across ChatGPT sessions. Read this before making changes.
 
 ## Product Goal
@@ -168,7 +170,7 @@ Therefore:
 - Non-urgent manual steps should wait until the user is safely able to interact.
 - Keep the user involved through voice-level product/engineering decisions rather than mechanical operations.
 
-## Immediate Next Steps
+## Historical Immediate Next Steps (superseded)
 
 1. In a fresh ChatGPT session, verify the Render plugin is exposed and connected.
 2. Inspect the latest AI-is-LOVE deployment and confirm commit f9cc9ab is live.
@@ -251,7 +253,7 @@ The one-shot Render startup experiment trigger was disabled after collecting res
 
 
 
-## Life Director v1 Handoff — 2026-10-07
+## Life Director v1 Handoff — 2026-10-07 (historical; superseded below)
 
 ### Why this work exists
 
@@ -294,7 +296,7 @@ Legacy `ongoing_threads: list[str]` still exists temporarily for compatibility.
    - Added `add_life_thread()`.
    - Preserved the legacy free-text `future_thread -> ongoing_threads` bridge for compatibility.
 
-### IMPORTANT: v1 is NOT complete yet
+### At the historical handoff: v1 was NOT complete yet
 
 Do not describe the 28-slice v1 experiment as completed.
 
@@ -363,3 +365,95 @@ No test suite was run during the handoff session. The two GitHub commits above a
 Different future AI characters should eventually have genuinely different personal worlds, not just different personality tags. Profession, social graph, responsibilities, interests, goals, schedules, and active life threads should create distinct lived experience.
 
 Real-world facts are grounding/background, not automatically things Mira knows or tells the player. World events should affect Mira only when her life plausibly intersects them and her personality/interests make them matter.
+
+
+## Life Director v1 Completed Checkpoint — 2026-10-07
+
+### Source and scope
+
+Continued directly from `main` at `039e76df2ebc1071295f606adeb149b88c0e6151`, after reading this entire file and inspecting the three requested commits. Preserved Mira's existing wildlife rescue veterinarian identity and four initial threads from `f6467889d08aa0d92dfd6fc254a95f1b6cae4c05`, and extended the Runtime work from `656364701050d4a7a29b4a832d4b1de5e3e285b9`. Life Director v1 was not restarted from scratch.
+
+**Mira exists and lives even when the player is absent.** The experiments contain no player intervention. This checkpoint establishes persistent continuity within a CharacterRuntime and a seven-day simulation, not a continuously running production character or persistence across process restarts.
+
+### Implementation commits
+
+- `f22cd1ace61cb309d326a9e262f9568593d0ee6d` — completed v1 Director, initialized Life Identity/structured threads in the API, added inspectable progression and tests.
+- `7c946c1ac710d39f3a3f8f50fb98a00a7088d9cc` — engineering iteration after run 1: concrete timed thread checkpoints and professional-realism/stagnation correction.
+- `c93e07b8d052ce1129295490a6da04e0aa856c3a` — both experiment traces, computed metrics and full analysis in `experiments/life-v1/`.
+- This final Project Status commit follows the evidence commit and records the completed checkpoint; use GitHub history to obtain its SHA.
+
+### Final implementation
+
+- `backend/life/director.py` receives Life Identity, active structured threads, recent lived experiences, recent memories, mental state, local weekday/hour, elapsed time, recent category counts and streaks. Datetimes are explicitly serialized.
+- Structured output includes `thread_id`, concise cumulative `thread_progress`, activity category, participants and location. For concrete unfinished commitments, the model can propose `thread_next_step` and a bounded `thread_next_step_in_hours` (6–168).
+- `CharacterRuntime.experience()` owns mutation: only an existing active thread with nonempty bounded progress can update its summary/timestamp and validated checkpoint. Unknown/inactive IDs, orphan progress and oversized/invalid updates cannot create or overwrite thread state. Accepted events normalize rejected thread claims before experiment reporting. Identity/status/importance are not model-writable.
+- Pending checkpoints persist as `LifeThread.next_step` and `next_check_at` and reach the next Director call; completed pending checkpoints can clear. Experiences also update mental mood and preserve existing salient-memory behavior. The legacy free-text bridge remains for v0 runtimes only.
+- API simulation initializes the preserved Mira Identity and threads; keeps one Runtime for all 28 slices; reports identity, final threads, progressed IDs, all event progression/checkpoints, locations/participants, memories, version and deployed commit SHA. Start time is 06:00 America/Los_Angeles for consistent dayparts.
+- Prompt structure uses profession, responsibilities, social graph, interests and goals; favors ordinary believable continuity, varied off-duty life and sleep, meaningful follow-through and very few exceptional events. Veterinary cases are fictional/non-identifiable. No current named venues, news, weather or externally grounded current claims are introduced as facts.
+- Removed the life startup trigger so redeployments cannot silently rerun paid experiments. Existing HTTP experiment routes remain available; only explicitly requested experiment calls were made.
+- Added `httpx` to development dependencies and isolated the existing API unit test from OpenAI client credential requirements.
+
+### Tests actually executed
+
+Installed development dependencies with `pip install -e '.[dev]'`; executed `python -m pytest -q`.
+
+- Initial full test execution: 20 passed, 1 failed. The failure was the pre-existing `/deliberate` test constructing the real OpenAI client before its stub deliberator, without local credentials. Fixed test isolation by stubbing the model constructor, without reading or adding a secret.
+- Initial v1 after correction: **21 passed**, 2 existing FastAPI startup deprecation warnings.
+- Final implementation with timed checkpoints: **28 passed**, 2 existing startup deprecation warnings. Repeated on the exact fetched GitHub implementation state: **28 passed**.
+- `git diff --check` passed. Local tested implementation contents matched fetched `origin/main`; the initial new test file's SHA256 also matched GitHub.
+- Coverage includes Identity and structured active-thread payloads; timezone and elapsed context; no Director-side mutation; valid Runtime progression; unknown/inactive IDs; orphan/empty/oversized progress; identity/other-thread preservation; memory/no-memory/legacy behavior; both GET and POST life API routes returning 28 six-hour slices with a shared Runtime; persistent checkpoint payloads; invalid intervals; and unknown IDs attempting checkpoint injection.
+- API tests use stubs and do not prove real model behavior; the two deployed experiments below supply separate real-LLM evidence.
+
+### Render verification
+
+Selected the user-confirmed workspace `My Workspace`, `tea-db00lfh42hec73eevbq0`. Inspected service `srv-db2oq0c9v7es739ncdh0` (AI-is-LOVE), confirmed its repository `https://github.com/brucwu/AI-is-LOVE`, branch `main`, auto-deploy enabled, build `pip install .`, start `uvicorn backend.api:app --host 0.0.0.0 --port $PORT`, `/health`, and public URL `https://ai-is-love.onrender.com`.
+
+- Initial v1 Render deployment `dep-db3b6pvf3r2c738k8jlg`: commit `f22cd1ace61cb309d326a9e262f9568593d0ee6d`, **live**, finished `2026-10-07T21:03:10.018142Z`. Confirmed before run 1.
+- Corrected v1 deployment `dep-db3b8mnf3r2c738kbpug`: commit `7c946c1ac710d39f3a3f8f50fb98a00a7088d9cc`, **live**, finished `2026-10-07T21:07:30.599965Z`. Confirmed before run 2.
+- Health returned `{"status":"ok"}`; deployed OpenAPI version `0.5.0`. Both POST responses identified the exact corresponding deployed commit and v1 version. No experiment was run before its implementation was confirmed live.
+- `OPENAI_API_KEY` was neither retrieved nor changed. No user-operated dashboard/log/testing steps were required.
+
+### Seven-day / 28-slice results
+
+Full traces and analysis: `experiments/life-v1/run-1.json`, `run-2.json`, their `*-metrics.json` files, and `ANALYSIS.md`. Each run: seven virtual days, six-hour spacing, 28 slices, zero player interventions; October 7 06:00 through October 14 00:00 local time. HTTP requests completed successfully and result metadata was checked.
+
+| Metric | Known v0 | v1 run 1 | Corrected v1 run 2 |
+|---|---|---:|---:|
+| Memories | 11 | 13 | 9 |
+| Career slices | Not recorded | 7 | 7 |
+| Social slices | Not recorded | 5 | 3 |
+| Interest slices | Not recorded | 2 | 5 |
+| Personal / rest slices | Not recorded | 4 / 10 | 3 / 10 |
+| Structured threads progressed | Free-text only | 4 | 3 |
+| Named-person interaction slices, including remote contact | Not recorded | 12 | 12 |
+| Outside-home or mixed-location slices, manually reviewed | Apartment-heavy | 16 | 13 |
+| Maximum consecutive category streak | Not recorded | 2 | 2 |
+
+Run 1 progressed all four threads but exposed repetitive "one more day" opossum checks, handling-stress release reasoning, vague plans and a repetitive life-balance summary. That triggered the tested/deployed correction and rerun; we did not stop after the first imperfect run.
+
+Corrected run 2 progressed work-rehab 7 times, photo-project 5 and nina-friendship 4. The life-balance thread was not explicitly progressed, though rest/off-duty/social choices enact it. Recurring participants: Jules in 7 slices, Dr. Elias Chen in 4, Nina in 5. Work was 25% of representative slices, not 25% of total time. Reported social categories undercount Nina's involvement in photography and texts.
+
+Causal examples from corrected run:
+
+- Opossum intensive-care transition -> enrichment -> due reassessment -> soft-release preparation -> monitoring -> release approval. Approval/handoff is shown; an actual release into habitat is not separately shown.
+- Photo theme -> six-image first edit -> five-image sequence -> Nina's outside-eye feedback -> final captions and an explicit decision to keep the finished series personal.
+- Suggested catch-up -> Saturday confirmation -> actual Saturday meeting with Nina. Friendship crosses into photo feedback later.
+
+Mostly ordinary life, with useful/share-worthy professional and personal progress and no constant emergencies/melodrama. Nine memories are more selective, not inherently worse than eleven or thirteen. Story density improves through follow-through and decisions, not exceptional events.
+
+### v0 versus v1 and remaining problems
+
+The known v0 failure was "Mira was trapped in her apartment organizing things for seven days." V1 gives her a profession, coworkers, recurring friendship, outside contact and a project that develops across time. The corrected run feels more like someone living a life than unrelated event generation. This is qualitative evidence from one run per implementation; the full v0 trace was not present in the repository, so exact statistical comparisons are not justified.
+
+Remaining weaknesses:
+
+- Still geographically narrow and emotionally placid. Dinner/walk/rest patterns and "quietly satisfied/restorative/phone on silent" language repeat. Hiking/music never appear. Run 2's photo work is mostly at home; improved causal continuity does not equal improved location diversity.
+- Nina's own life and Dr. Chen's independent perspective remain shallow. Recurring names alone do not establish deep relationships.
+- Some narrative inconsistencies remain: slice 3 reverses the earlier photo sender; a Saturday afternoon plan becomes dinner without an explicit explanation.
+- Checkpoints are advisory, not a complete calendar or commitment engine. Clinical narrative still has coarse repeated monitoring and treats approval as case completion without showing release. General wildlife realism remains LLM-generated.
+- Thread summaries/checkpoints persist within Runtime, but typed lifecycle, archival, long-horizon factual validation and commitment completion need work. A completed photo project remains in an active broad thread.
+- No database/restart persistence, autonomous worker, explicit work roster or World Grounding yet. Director currently sees the last eight experiences/eight memories; Runtime keeps 30 experiences. Do not claim a production persistent independent-life system is complete.
+
+### Recommended next step
+
+Keep this checkpoint and implement durable Runtime persistence plus structured commitment/experience records, then connect the background life loop. Use the preserved traces as regression references for longer-lived plans, release handoffs, social perspectives and off-duty breadth. Preserve personality-driven behavior, stable love and WAIT. Do not impose rigid category rotation or add forced conflict/emergencies. Ask the user before making major life-style/emotional-direction decisions; World Grounding remains a later layer.
