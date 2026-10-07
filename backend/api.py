@@ -69,6 +69,7 @@ def deliberate(request: DeliberationRequest) -> dict:
     return run_deliberation(request)
 
 
+@app.get("/experiments/behavior")
 @app.post("/experiments/behavior")
 def behavior_experiment() -> dict:
     scenarios = [
