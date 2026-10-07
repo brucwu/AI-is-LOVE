@@ -482,3 +482,14 @@ User explicitly requested native Chinese characterization rather than English tr
 - API version 0.5.1; life experiment metadata reports language zh-TW.
 - Actual test execution before publication: 30 tests passed (2 existing FastAPI startup deprecation warnings). Unicode continuity test checks memory, emotion and checkpoint delivery unchanged; cognition test checks Chinese reason/intent unchanged.
 - Deployment and real Chinese generation validation are pending at this implementation commit; do not treat stub tests as evidence of native phrasing.
+
+
+### Chinese generation deployed and exercised — 2026-10-07
+
+User explicitly authorized merging PR #1. GitHub confirmed merge commit `1e1aff32b93adde25bf1cf7f5a381b5cb8006f87`. Render deployment `dep-db3bl6mq1p3s73ff54f0` was verified live, finished 2026-10-07T21:34:07.993207Z; deployed OpenAPI reports 0.5.1 and health returned ok. Re-executed tests on the exact merged checkout: **30 passed**, two existing startup deprecation warnings.
+
+After live confirmation, ran one real POST /experiments/life: seven virtual days, 28 six-hour slices, zero player intervention, response SHA exactly matches merge commit, language zh-TW. Trace is experiments/life-zh-tw/run-1.json. Category counts: career 10, rest 7, interest 5, social 3, personal 3. Three structured threads progressed; 15 memories created. A separate real POST /deliberate returned ACT with Chinese reason and intent (trace deliberation.json). API key was not read or modified.
+
+Chinese narrative is generated directly and the hawk case progresses through rehabilitation to actual release; the eight-image photo sequence reaches final ordering/title/backup. Nina recurs across three social slices. This confirms Chinese output and retained causal continuity, not the language of hidden reasoning. Compared with the English corrected run, work slices rose from 7 to 10; this single stochastic run cannot establish a systematic language effect.
+
+Remaining weaknesses: repeated 踏實/放鬆 and work-versus-rest explanations; some first/third-person switching; slice 13 at 06:00 narrates sleep and upcoming morning, while slice 14 at noon describes the morning release. Clinical reassessment still repeats. Off-duty activities remain narrow. The outputs are internal life records, not finished player-facing dialogue. No new broad product direction or prompt correction was introduced in this validation. Recommended next step: retain this evidence and address narrative perspective/time consistency and less formulaic emotional expression; durable persistence/background life loop remains outstanding.
