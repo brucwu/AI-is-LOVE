@@ -25,7 +25,7 @@ class OpenAIStructuredModel:
         self.client = client
         self.model = model
 
-    def generate_json(self, *, system: str, payload: dict) -> dict:
+    def generate_json(self, *, system: str, payload: dict, schema: dict | None = None, schema_name: str = "deliberation_result") -> dict:
         response = self.client.responses.create(
             model=self.model,
             instructions=system,
@@ -34,9 +34,9 @@ class OpenAIStructuredModel:
             text={
                 "format": {
                     "type": "json_schema",
-                    "name": "deliberation_result",
+                    "name": schema_name,
                     "strict": True,
-                    "schema": DELIBERATION_SCHEMA,
+                    "schema": schema or DELIBERATION_SCHEMA,
                 }
             },
             store=False,
