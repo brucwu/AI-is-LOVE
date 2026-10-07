@@ -1,6 +1,6 @@
 # AI is LOVE — Project Status
 
-_Last updated: 2026-10-06_
+_Last updated: 2026-10-07_
 
 This file is the canonical handoff checkpoint for continuing the project across ChatGPT sessions. Read this before making changes.
 
@@ -249,3 +249,117 @@ The model's internal timing remains under-differentiated: wakeup intervals clust
 
 The one-shot Render startup experiment trigger was disabled after collecting results to avoid repeated OpenAI calls on future restarts.
 
+
+
+## Life Director v1 Handoff — 2026-10-07
+
+### Why this work exists
+
+The first seven-day Life Simulation v0 ran 28 representative life slices (one every six hours) with no player intervention. It showed genuine continuity: small plans and concerns carried across slices and 11 memories were created. However, Mira's life was too narrow, safe, and repetitive—dominated by apartment tidying, receipts, kitchen tasks, tea, and similar domestic activity. The shorthand diagnosis was: **Mira was effectively trapped in her apartment organizing things for seven days.**
+
+The v1 goal is to make Mira a person with an independent, persistent life—not merely a romantic cognition loop waiting for the player.
+
+Conceptual flow:
+
+Real World -> World Grounding -> Life Director -> lived experiences/memory -> emotional/relationship deliberation
+
+World Grounding is a later layer. Until it exists, the Life Director must not invent named/current real-world facts.
+
+### v1 data model already present
+
+`backend/character/models.py` contains:
+
+- `LifePerson`
+- `LifeIdentity`: profession/context, skills, interests, important people, long-term goals, responsibilities
+- structured `LifeThread`: id, category, title, summary, status, importance, last_progress_at
+- `LivedExperience.thread_id` and `thread_progress`
+- `LifeState.identity` and `LifeState.threads`
+
+Legacy `ongoing_threads: list[str]` still exists temporarily for compatibility.
+
+### Work completed in the 2026-10-07 handoff session
+
+1. Added `backend/life/mira.py` in commit `f6467889d08aa0d92dfd6fc254a95f1b6cae4c05`.
+   - Development Mira now has a concrete Life Identity.
+   - Profession chosen as **wildlife rescue veterinarian in Southern California**.
+   - This is intentionally story-dense but grounded: triage/rehabilitation/release decisions, coworkers, volunteers, paperwork, occasional urgent calls, plus a normal off-duty life.
+   - Important people currently include Nina (close friend), Dr. Elias Chen (mentor/colleague), and Jules (rehabilitation technician).
+   - Interests include hiking, nature photography, small restaurants, live music, cooking, and walks.
+   - Initial structured threads: rehabilitation cases, urban-wildlife photography project, friendship with Nina, and protecting a life outside work.
+   - Patient/event details must remain fictional unless supplied through World Grounding; avoid identifiable patient data.
+
+2. Updated `backend/character/runtime.py` in commit `656364701050d4a7a29b4a832d4b1de5e3e285b9`.
+   - `experience()` now recognizes `thread_id`.
+   - Valid existing structured threads can receive `thread_progress`, update their summary, and set `last_progress_at`.
+   - Added `add_life_thread()`.
+   - Preserved the legacy free-text `future_thread -> ongoing_threads` bridge for compatibility.
+
+### IMPORTANT: v1 is NOT complete yet
+
+Do not describe the 28-slice v1 experiment as completed.
+
+At this handoff point, `backend/life/director.py` is still the v0 implementation:
+
+- its prompt literally refers to the simulation as v0;
+- payload does not include `LifeIdentity` or structured `LifeThread`;
+- schema does not return `thread_id` or `thread_progress`;
+- it still returns only the legacy `future_thread`.
+
+`backend/api.py` also still constructs the life-simulation runtime without assigning `mira_life_identity()` or `mira_initial_threads()`, and the experiment response still reports legacy `ongoing_threads`.
+
+No test suite was run during the handoff session. The two GitHub commits above are code writes, not proof that tests pass.
+
+### Next implementation steps for Life Director v1
+
+1. Rewrite `backend/life/director.py` as v1.
+   - Include Life Identity and active structured threads in the model payload.
+   - Include time/day context and recent thread progression.
+   - Ask the model to select an existing `thread_id` when an event advances a thread and return concise `thread_progress`.
+   - Runtime, not the LLM, owns state mutation and must validate thread IDs.
+   - Avoid allowing the model to arbitrarily rewrite the entire life state.
+
+2. Prompt behavior.
+   - Mira has a life independent of the player.
+   - Advance one main life thread per slice (occasionally an unthreaded ordinary event is fine).
+   - Avoid one category dominating consecutive slices unless obligations make that realistic.
+   - Use profession, relationships, interests, responsibilities, and long-term goals.
+   - Balance: mostly ordinary life, some meaningful/share-worthy moments, very few exceptional events.
+   - Do not manufacture melodrama.
+   - Respect work realism/confidentiality.
+   - Do not invent current named venues/news/weather/world facts before World Grounding exists.
+
+3. Update `backend/api.py`.
+   - Initialize the simulation runtime with `mira_life_identity()` and `mira_initial_threads()`.
+   - Include structured thread information in experiment output so continuity can be evaluated.
+
+4. Add/adjust tests.
+   - Identity appears in Life Director payload.
+   - Structured thread progress persists across experiences.
+   - Unknown `thread_id` is ignored/rejected safely rather than creating arbitrary state.
+   - Existing memory behavior remains intact.
+   - Life experiment/API still works.
+
+5. Actually run tests. Do not claim success from GitHub commits alone.
+
+6. Deploy through the existing Render auto-deploy and inspect the live deployment/logs. Use the connected Render plugin directly where available.
+
+7. Only after v1 is live, run the same seven-day / 28-slice experiment (6-hour slices, no player intervention).
+
+8. Compare v1 against v0. At minimum evaluate:
+   - activity/category diversity;
+   - profession/work presence without work dominating everything;
+   - social events and important-person continuity;
+   - outside-home locations;
+   - number of structured threads progressed;
+   - repeated activities/categories;
+   - memories created;
+   - multi-slice causal continuity;
+   - story density without melodrama.
+
+9. Update this PROJECT_STATUS again with implementation commits, actual test/deploy status, the 28-slice results, v0-v1 comparison, and next product decision.
+
+### Product direction to preserve
+
+Different future AI characters should eventually have genuinely different personal worlds, not just different personality tags. Profession, social graph, responsibilities, interests, goals, schedules, and active life threads should create distinct lived experience.
+
+Real-world facts are grounding/background, not automatically things Mira knows or tells the player. World events should affect Mira only when her life plausibly intersects them and her personality/interests make them matter.
