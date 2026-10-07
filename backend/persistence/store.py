@@ -1,6 +1,7 @@
 import json
 import sqlite3
 import types
+from contextlib import contextmanager
 from dataclasses import fields, is_dataclass
 from datetime import datetime
 from enum import Enum
@@ -63,15 +64,23 @@ class RuntimeStore:
             self.placeholder = '%s'
         else:
             raise ValueError('Use sqlite:/// locally or a PostgreSQL DATABASE_URL')
-        with self.connection:
+        with self.transaction():
             self.connection.execute('CREATE TABLE IF NOT EXISTS character_snapshots '
                                     '(character_id TEXT PRIMARY KEY, revision INTEGER NOT NULL, payload TEXT NOT NULL)')
+
+    @contextmanager
+    def transaction(self):
+        # psycopg's connection context closes the connection; its transaction
+        # context commits/rolls back while preserving it for later load/save.
+        context = self.connection if self.placeholder == '?' else self.connection.transaction()
+        with context:
+            yield
 
     def close(self):
         self.connection.close()
 
     def load(self, character_id):
-        with self.connection:
+        with self.transaction():
             row = self.connection.execute(
                 f'SELECT revision, payload FROM character_snapshots WHERE character_id={self.placeholder}',
                 (character_id,)).fetchone()
@@ -90,7 +99,7 @@ class RuntimeStore:
             raise ValueError('Invalid expected revision')
         payload = json.dumps({'schema_version': 1, 'runtime': encode(runtime)}, ensure_ascii=False)
         p = self.placeholder
-        with self.connection:
+        with self.transaction():
             if expected_revision == 0:
                 cursor = self.connection.execute(
                     f'INSERT INTO character_snapshots (character_id, revision, payload) VALUES ({p}, 1, {p}) '
@@ -103,3 +112,4 @@ class RuntimeStore:
             if cursor.rowcount != 1:
                 raise ConflictError('Snapshot changed; reload before retrying')
         return expected_revision + 1
+
