@@ -1,18 +1,21 @@
 import json
 import logging
 import os
-from datetime import datetime, timezone
+from dataclasses import asdict
+from datetime import datetime, timedelta, timezone
+from zoneinfo import ZoneInfo
 
 from fastapi import FastAPI
 from pydantic import BaseModel, Field
 
-from backend.character.models import CharacterProfile, Memory, RelationshipStage, RelationshipState
+from backend.character.models import CharacterProfile, LifeState, Memory, RelationshipStage, RelationshipState
 from backend.character.runtime import CharacterRuntime
 from backend.deliberation.llm import LLMDeliberator
 from backend.models.openai import OpenAIStructuredModel
-from backend.life.director import LLMLifeDirector
+from backend.life.director import LLMLifeDirector, serialize_experience, serialize_thread
+from backend.life.mira import mira_life_identity, mira_initial_threads
 
-app = FastAPI(title="AI is LOVE", version="0.4.0")
+app = FastAPI(title="AI is LOVE", version="0.5.0")
 logger = logging.getLogger("ai_is_love.behavior")
 
 
@@ -145,16 +148,6 @@ def optional_startup_behavior_experiment() -> None:
         logger.exception("BEHAVIOR_EXPERIMENT_FAILED")
 
 
-@app.on_event("startup")
-def optional_startup_life_experiment() -> None:
-    if os.getenv("RUN_LIFE_EXPERIMENT_ON_STARTUP", "").lower() not in {"1", "true", "yes"}:
-        return
-    try:
-        run_life_simulation()
-    except Exception:
-        logger.exception("LIFE_SIMULATION_FAILED")
-
-
 @app.get("/")
 def root() -> dict[str, str]:
     return {"service": "AI is LOVE", "status": "ok"}
@@ -183,16 +176,32 @@ def stage_experiment() -> dict:
 
 
 def run_life_simulation(days: int = 7, slice_hours: int = 6) -> dict:
-    runtime = CharacterRuntime(profile=CharacterProfile(id="development-character", name="Mira", personality="warm, independent, emotionally attentive", expression_style="natural, affectionate, not clingy"))
+    if days < 1 or slice_hours < 1 or days * 24 % slice_hours:
+        raise ValueError("Simulation requires positive days and evenly dividing slices")
+    runtime = CharacterRuntime(
+        profile=CharacterProfile(id="development-character", name="Mira",
+                                 personality="warm, independent, emotionally attentive",
+                                 expression_style="natural, affectionate, not clingy"),
+        life=LifeState(identity=mira_life_identity(), threads=mira_initial_threads()),
+    )
     director = LLMLifeDirector(OpenAIStructuredModel())
-    now = datetime.now(timezone.utc)
+    # Comparable local dayparts; not dependent on the UTC hour the endpoint was called.
+    now = datetime.now(ZoneInfo("America/Los_Angeles")).replace(hour=6, minute=0, second=0, microsecond=0)
     events = []
     for step in range(days * 24 // slice_hours):
-        event_time = now + __import__("datetime").timedelta(hours=step * slice_hours)
-        event = director.advance(runtime, event_time)
-        runtime.experience(event)
-        events.append({"occurred_at": event.occurred_at.isoformat(), "activity": event.activity, "summary": event.summary, "emotional_reaction": event.emotional_reaction, "salience": event.salience, "creates_memory": event.creates_memory, "future_thread": event.future_thread})
-    payload = {"character":"Mira","experiment":"seven_days_without_player","days":days,"slice_hours":slice_hours,"events":events,"memories_created":len(runtime.memories),"ongoing_threads":runtime.life.ongoing_threads}
+        event_time = now + timedelta(hours=step * slice_hours)
+        event = runtime.experience(director.advance(runtime, event_time))
+        events.append(serialize_experience(event))
+    payload = {
+        "character": "Mira", "experiment": "seven_days_without_player",
+        "version": "life-director-v1", "commit_sha": os.getenv("RENDER_GIT_COMMIT"),
+        "days": days, "slice_hours": slice_hours, "player_interventions": 0,
+        "life_identity": asdict(runtime.life.identity), "events": events,
+        "memories_created": len(runtime.memories),
+        "threads": [serialize_thread(t) for t in runtime.life.threads],
+        "threads_progressed": sorted({e.thread_id for e in runtime.life.recent_experiences if e.thread_id}),
+        "ongoing_threads": runtime.life.ongoing_threads,
+    }
     logger.warning("LIFE_SIMULATION_RESULT %s", json.dumps(payload, ensure_ascii=False))
     return payload
 

@@ -1,4 +1,4 @@
-from dataclasses import dataclass, field
+from dataclasses import dataclass, field, replace
 from datetime import datetime
 
 from backend.character.models import (
@@ -30,20 +30,29 @@ class CharacterRuntime:
     def remember(self, memory: Memory) -> None:
         self.memories.append(memory)
 
-    def experience(self, event: LivedExperience) -> None:
+    def experience(self, event: LivedExperience) -> LivedExperience:
+        """Apply an experience; only known active threads accept bounded progress.
+
+        Return the accepted event so callers do not report rejected model claims.
+        Identity, thread IDs/status/importance and other threads remain Runtime-owned.
+        """
+        thread = next((t for t in self.life.threads
+                       if t.id == event.thread_id and t.status == "active"), None)
+        progress = event.thread_progress.strip() if isinstance(event.thread_progress, str) else ""
+        if thread is not None and progress and len(progress) <= 2000:
+            thread.summary = progress
+            thread.last_progress_at = event.occurred_at
+            event = replace(event, thread_progress=progress)
+        else:
+            event = replace(event, thread_id=None, thread_progress=None)
+
         self.life.current_activity = event.activity
+        self.mental.mood = event.emotional_reaction
         self.life.recent_experiences.append(event)
         self.life.recent_experiences = self.life.recent_experiences[-30:]
 
-        if event.thread_id:
-            thread = next((t for t in self.life.threads if t.id == event.thread_id), None)
-            if thread:
-                if event.thread_progress:
-                    thread.summary = event.thread_progress
-                thread.last_progress_at = event.occurred_at
-
-        # Legacy bridge while older simulations/fixtures still use free-text threads.
-        if event.future_thread and event.future_thread not in self.life.ongoing_threads:
+        # Preserve v0 fixtures; structured v1 state does not accept arbitrary free-text threads.
+        if self.life.identity is None and event.future_thread and event.future_thread not in self.life.ongoing_threads:
             self.life.ongoing_threads.append(event.future_thread)
 
         if event.creates_memory:
@@ -53,6 +62,7 @@ class CharacterRuntime:
                 importance=event.salience,
                 emotional_weight=min(1.0, max(-1.0, event.salience)),
             ))
+        return event
 
     def add_life_thread(self, thread: LifeThread) -> None:
         if not any(existing.id == thread.id for existing in self.life.threads):

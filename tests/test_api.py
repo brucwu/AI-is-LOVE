@@ -27,6 +27,7 @@ def test_health():
 
 def test_deliberate_endpoint(monkeypatch):
     monkeypatch.setattr(api, "LLMDeliberator", StubDeliberator)
+    monkeypatch.setattr(api, "OpenAIStructuredModel", lambda: object())
     client = TestClient(api.app)
     response = client.post(
         "/deliberate",

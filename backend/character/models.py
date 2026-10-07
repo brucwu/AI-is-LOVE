@@ -110,6 +110,8 @@ class LivedExperience:
     future_thread: str | None = None
     thread_id: str | None = None
     thread_progress: str | None = None
+    category: str = "personal"
+    participants: list[str] = field(default_factory=list)
 
 
 @dataclass
