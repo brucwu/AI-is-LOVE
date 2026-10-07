@@ -100,16 +100,16 @@ class CharacterRuntime:
         r = self.relationship
         if commitment >= 1.0 and r.trust >= 0.75 and r.intimacy >= 0.7 and r.security >= 0.7:
             r.stage = RelationshipStage.PASSIONATE
-            r.stage_reason = "Strong mutual commitment plus high trust, intimacy, and security."
+            r.stage_reason = "彼此有明確承諾，也有深厚的信任、親密和安全感。"
         elif commitment >= 0.5 and r.trust >= 0.65 and r.security >= 0.6:
             r.stage = RelationshipStage.COMMITTED
-            r.stage_reason = "Explicit commitment is supported by sustained trust and security."
+            r.stage_reason = "彼此的承諾有持續的信任與安全感支持。"
         elif reciprocal >= 1.2 and positive >= 1.5 and r.trust >= 0.55 and r.intimacy >= 0.45:
             r.stage = RelationshipStage.EARLY_ROMANCE
-            r.stage_reason = "Repeated reciprocal affection/vulnerability supports an emerging romance."
+            r.stage_reason = "彼此多次表達喜歡、坦露脆弱，戀情正在萌芽。"
         elif reciprocal >= 0.5 and positive >= 0.7:
             r.stage = RelationshipStage.MUTUAL_INTEREST
-            r.stage_reason = "There is meaningful evidence that romantic interest is becoming reciprocal."
+            r.stage_reason = "有具體跡象顯示，這份喜歡正在得到回應。"
         else:
             r.stage = RelationshipStage.ATTRACTION
-            r.stage_reason = "Attraction exists, but reciprocal romantic evidence is still limited."
+            r.stage_reason = "已經喜歡對方，但還不太確定對方的心意。"

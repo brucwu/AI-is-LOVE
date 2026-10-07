@@ -470,3 +470,15 @@ Fixed `pyproject.toml` with explicit setuptools build configuration and package 
 Actually executed `pip wheel . --no-deps --wheel-dir /workspace/scratch/51b54a0a0bce/wheels` successfully, inspected the wheel to confirm backend API/Director were included and experiments/tests excluded, and reran `python -m pytest -q`: **28 passed**, 2 existing deprecation warnings. `git diff --check` passed. Render deployment `dep-db3bcojl550s73cr0su0` for `827de248ab70296a237b9c29a298576b436e372e` was then verified **live**, finished `2026-10-07T21:16:14.432121Z`.
 
 No behavior code or experiment data changed in the packaging recovery, so the two previously verified deployed experiments remain the evidence for Life Director v1; no additional paid experiment was run. This final status-only update is auto-deployed from main and will be checked after publication.
+
+
+## Native Traditional Chinese generation — 2026-10-07
+
+User explicitly requested native Chinese characterization rather than English translated afterward; confirmed Taiwan-style natural Traditional Chinese for life generation, cognition, emotions, memories and intentions. Keep Southern California setting, profession and personality; do not infer a different nationality/upbringing.
+
+- Replaced Life Director and romantic deliberation system prompts with Chinese equivalents, preserving thread authority/checkpoints, ACT/WAIT, stable affection, professional realism, diversity and grounding restrictions.
+- Localized Mira identity, initial thread descriptions, API default profile/scenarios and Runtime descriptive state. English JSON keys, enums, IDs and person names remain compatible. Existing English traces remain unchanged evidence; mixed-language historical inputs are explicitly supported.
+- Free-text output is instructed to be natural Traditional Chinese, concrete and personality-dependent, without repetitive abstract emotional labels or forced lyrical narration. This does not establish the model's hidden reasoning language or guarantee linguistic quality.
+- API version 0.5.1; life experiment metadata reports language zh-TW.
+- Actual test execution before publication: 30 tests passed (2 existing FastAPI startup deprecation warnings). Unicode continuity test checks memory, emotion and checkpoint delivery unchanged; cognition test checks Chinese reason/intent unchanged.
+- Deployment and real Chinese generation validation are pending at this implementation commit; do not treat stub tests as evidence of native phrasing.

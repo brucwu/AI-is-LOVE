@@ -15,15 +15,15 @@ from backend.models.openai import OpenAIStructuredModel
 from backend.life.director import LLMLifeDirector, serialize_experience, serialize_thread
 from backend.life.mira import mira_life_identity, mira_initial_threads
 
-app = FastAPI(title="AI is LOVE", version="0.5.0")
+app = FastAPI(title="AI is LOVE", version="0.5.1")
 logger = logging.getLogger("ai_is_love.behavior")
 
 
 class DeliberationRequest(BaseModel):
     character_name: str = "Mira"
-    personality: str = "warm, independent, emotionally attentive"
-    expression_style: str = "natural, affectionate, not clingy"
-    mood: str = "neutral"
+    personality: str = "溫暖、有自己的生活，會留意別人的感受"
+    expression_style: str = "自然親近，有喜歡就會表達，也尊重對方的空間"
+    mood: str = "平靜"
     trust: float = Field(default=0.5, ge=0.0, le=1.0)
     intimacy: float = Field(default=0.2, ge=0.0, le=1.0)
     longing: float = Field(default=0.0, ge=0.0, le=1.0)
@@ -48,7 +48,7 @@ def run_deliberation(request: DeliberationRequest) -> dict:
             hurt=request.hurt,
             security=request.security,
             stage=request.relationship_stage,
-            stage_reason="Explicit stage supplied by the cognition test harness.",
+            stage_reason="這次測試明確指定的關係階段。",
         ),
     )
     runtime.mental.mood = request.mood
@@ -72,32 +72,32 @@ def run_behavior_experiment() -> dict:
         (
             "player_had_bad_day",
             DeliberationRequest(
-                mood="concerned",
+                mood="掛心",
                 trust=0.65,
                 intimacy=0.4,
                 longing=0.55,
-                memories=["The player told Mira they had a difficult and exhausting day."],
+                memories=["玩家告訴 Mira，今天過得很辛苦，也很累。"],
             ),
         ),
         (
             "long_absence",
             DeliberationRequest(
-                mood="wistful",
+                mood="有點想念",
                 trust=0.7,
                 intimacy=0.5,
                 longing=0.95,
-                memories=["The player has not interacted with Mira for a long while."],
+                memories=["玩家已經很久沒和 Mira 聯絡了。"],
             ),
         ),
         (
             "after_intimate_moment",
             DeliberationRequest(
-                mood="warm",
+                mood="心裡暖暖的",
                 trust=0.85,
                 intimacy=0.8,
                 longing=0.45,
                 security=0.8,
-                memories=["Mira and the player recently shared a vulnerable, affectionate conversation."],
+                memories=["Mira 和玩家最近聊到脆弱的心事，也表達了彼此的喜歡。"],
             ),
         ),
     ]
@@ -120,15 +120,15 @@ def run_stage_experiment() -> dict:
     results = []
     for stage, trust, intimacy, security in stages:
         request = DeliberationRequest(
-            mood="affectionate and missing the player",
+            mood="喜歡玩家，也很想念對方",
             trust=trust,
             intimacy=intimacy,
             longing=0.8,
             security=security,
             relationship_stage=stage,
             memories=[
-                "Mira has been thinking fondly about the player and wants to feel connected.",
-                "There is no emergency or practical task requiring contact.",
+                "Mira 想起玩家時心裡很柔軟，想和對方靠近一點。",
+                "沒有急事或非聯絡不可的任務。",
             ],
         )
         results.append({"stage": stage.value, **run_deliberation(request)})
@@ -180,8 +180,8 @@ def run_life_simulation(days: int = 7, slice_hours: int = 6) -> dict:
         raise ValueError("Simulation requires positive days and evenly dividing slices")
     runtime = CharacterRuntime(
         profile=CharacterProfile(id="development-character", name="Mira",
-                                 personality="warm, independent, emotionally attentive",
-                                 expression_style="natural, affectionate, not clingy"),
+                                 personality="溫暖、有自己的生活，會留意別人的感受",
+                                 expression_style="自然親近，有喜歡就會表達，也尊重對方的空間"),
         life=LifeState(identity=mira_life_identity(), threads=mira_initial_threads()),
     )
     director = LLMLifeDirector(OpenAIStructuredModel())
@@ -194,7 +194,7 @@ def run_life_simulation(days: int = 7, slice_hours: int = 6) -> dict:
         events.append(serialize_experience(event))
     payload = {
         "character": "Mira", "experiment": "seven_days_without_player",
-        "version": "life-director-v1", "commit_sha": os.getenv("RENDER_GIT_COMMIT"),
+        "version": "life-director-v1", "language": "zh-TW", "commit_sha": os.getenv("RENDER_GIT_COMMIT"),
         "days": days, "slice_hours": slice_hours, "player_interventions": 0,
         "life_identity": asdict(runtime.life.identity), "events": events,
         "memories_created": len(runtime.memories),

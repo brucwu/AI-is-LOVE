@@ -74,12 +74,12 @@ class RelationshipState:
     hurt: float = 0.0
     security: float = 0.5
     stage: RelationshipStage = RelationshipStage.ATTRACTION
-    stage_reason: str = "Initial romantic attraction; mutual commitment is not yet established."
+    stage_reason: str = "已經心動，但還沒有彼此承諾。"
 
 
 @dataclass
 class MentalState:
-    mood: str = "neutral"
+    mood: str = "平靜"
     unresolved_intentions: list[str] = field(default_factory=list)
     last_deliberated_at: datetime | None = None
 
@@ -120,7 +120,7 @@ class LivedExperience:
 
 @dataclass
 class LifeState:
-    current_activity: str = "living an ordinary day"
+    current_activity: str = "過著平常的一天"
     identity: LifeIdentity | None = None
     threads: list[LifeThread] = field(default_factory=list)
     ongoing_threads: list[str] = field(default_factory=list)
