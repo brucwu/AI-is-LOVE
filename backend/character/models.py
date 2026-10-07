@@ -8,6 +8,14 @@ class Decision(str, Enum):
     WAIT = "WAIT"
 
 
+class RelationshipStage(str, Enum):
+    ATTRACTION = "attraction"
+    MUTUAL_INTEREST = "mutual_interest"
+    EARLY_ROMANCE = "early_romance"
+    COMMITTED = "committed"
+    PASSIONATE = "passionate"
+
+
 @dataclass
 class CharacterProfile:
     id: str
@@ -19,12 +27,23 @@ class CharacterProfile:
 
 
 @dataclass
+class RelationshipEvidence:
+    kind: str
+    description: str
+    occurred_at: datetime
+    valence: float = 0.0
+    significance: float = 0.5
+
+
+@dataclass
 class RelationshipState:
     trust: float = 0.5
     intimacy: float = 0.2
     longing: float = 0.0
     hurt: float = 0.0
     security: float = 0.5
+    stage: RelationshipStage = RelationshipStage.ATTRACTION
+    stage_reason: str = "Initial romantic attraction; mutual commitment is not yet established."
 
 
 @dataclass
