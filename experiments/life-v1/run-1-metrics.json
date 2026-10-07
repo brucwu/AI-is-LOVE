@@ -1,0 +1,25 @@
+{
+  "commit_sha": "f22cd1ace61cb309d326a9e262f9568593d0ee6d",
+  "slices": 28,
+  "categories": {
+    "rest": 10,
+    "career": 7,
+    "social": 5,
+    "interest": 2,
+    "personal": 4
+  },
+  "thread_progress_counts": {
+    "work-rehab": 7,
+    "nina-friendship": 4,
+    "photo-project": 2,
+    "life-balance": 4
+  },
+  "participants": {
+    "Jules": 8,
+    "Dr. Elias Chen": 4,
+    "Nina": 4
+  },
+  "slices_with_people": 12,
+  "memories_created": 13,
+  "longest_category_streak": 2
+}

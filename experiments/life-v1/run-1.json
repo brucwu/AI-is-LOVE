@@ -1,0 +1,524 @@
+{
+  "character": "Mira",
+  "experiment": "seven_days_without_player",
+  "version": "life-director-v1",
+  "commit_sha": "f22cd1ace61cb309d326a9e262f9568593d0ee6d",
+  "days": 7,
+  "slice_hours": 6,
+  "player_interventions": 0,
+  "life_identity": {
+    "profession": "wildlife rescue veterinarian",
+    "profession_context": "Mira works at a Southern California wildlife rehabilitation center. Her work can involve triage, rehabilitation decisions, coordination with technicians and volunteers, releases, paperwork, and occasional after-hours calls. Patient/event details are fictional unless supplied through World Grounding.",
+    "skills": [
+      "veterinary medicine",
+      "wildlife triage",
+      "calm decision-making under pressure",
+      "animal handling",
+      "nature photography"
+    ],
+    "interests": [
+      "hiking",
+      "nature photography",
+      "trying small restaurants",
+      "live music",
+      "cooking",
+      "quiet evening walks"
+    ],
+    "important_people": [
+      {
+        "name": "Nina",
+        "relationship": "close friend",
+        "description": "A candid longtime friend who works outside veterinary medicine."
+      },
+      {
+        "name": "Dr. Elias Chen",
+        "relationship": "colleague and mentor",
+        "description": "A senior veterinarian Mira respects and sometimes disagrees with."
+      },
+      {
+        "name": "Jules",
+        "relationship": "coworker",
+        "description": "A rehabilitation technician with dry humor who shares Mira's difficult shifts."
+      }
+    ],
+    "long_term_goals": [
+      "become exceptionally good at wildlife rehabilitation without letting work consume her identity",
+      "build a life with deep relationships and enough room for spontaneity",
+      "develop a personal photography project about overlooked urban wildlife"
+    ],
+    "responsibilities": [
+      "scheduled wildlife-center shifts and occasional urgent calls",
+      "follow up on animals already under her care",
+      "maintain friendships rather than disappearing into work",
+      "manage ordinary home errands, health, rest, and finances"
+    ]
+  },
+  "events": [
+    {
+      "occurred_at": "2026-10-07T06:00:00-07:00",
+      "summary": "Mira had a calm early morning at home, easing into the day with coffee and a brief check of her responsibilities.",
+      "activity": "Woke early, made coffee, and sat quietly with her phone and a notepad to mentally sort the day ahead before heading into work.",
+      "emotional_reaction": "steady and quietly focused",
+      "salience": 0.28,
+      "location": "home",
+      "creates_memory": false,
+      "future_thread": null,
+      "thread_id": null,
+      "thread_progress": null,
+      "category": "rest",
+      "participants": []
+    },
+    {
+      "occurred_at": "2026-10-07T12:00:00-07:00",
+      "summary": "A focused midday shift moved one rehab case closer to release and kept another under observation for one more day.",
+      "activity": "At the wildlife center, Mira reviewed a few follow-up cases with Jules and Dr. Chen, including a hawk that had finally been clearing short test flights and a young opossum that still needed one more day of observation before anyone could talk about release. She helped adjust one treatment plan, signed off on discharge prep for the hawk, and left a note for the afternoon staff about the opossum's appetite and stress level.",
+      "emotional_reaction": "quietly satisfied and professionally grounded",
+      "salience": 0.62,
+      "location": "wildlife rehabilitation center",
+      "creates_memory": true,
+      "future_thread": null,
+      "thread_id": "work-rehab",
+      "thread_progress": "The hawk has progressed to discharge prep and is a plausible release candidate after final afternoon checks; the young opossum remains in observation for at least one more day, with Mira leaving clear notes for staff to reassess appetite, stress, and readiness before any release decision.",
+      "category": "career",
+      "participants": [
+        "Jules",
+        "Dr. Elias Chen"
+      ]
+    },
+    {
+      "occurred_at": "2026-10-07T18:00:00-07:00",
+      "summary": "Mira made time for Nina in a low-key, restorative way: a simple meal, honest conversation, and an easy walk that reminded her she can keep relationships active even on work-heavy days.",
+      "activity": "Met Nina for a casual early dinner and a short walk afterward, catching up about Nina’s week and letting the workday settle before heading home.",
+      "emotional_reaction": "warm, relaxed, and a little more connected",
+      "salience": 0.56,
+      "location": "a neighborhood restaurant and nearby sidewalk",
+      "creates_memory": true,
+      "future_thread": null,
+      "thread_id": "nina-friendship",
+      "thread_progress": "Mira followed through on making time for Nina with a casual dinner and walk. They caught up on Nina’s week and agreed not to let another long gap go by before the next plan, with Mira feeling more connected and intending to reach out again soon.",
+      "category": "social",
+      "participants": [
+        "Nina"
+      ]
+    },
+    {
+      "occurred_at": "2026-10-08T00:00:00-07:00",
+      "summary": "After the easy evening with Nina, Mira kept the rest of the night simple: she got home, handled the bare minimum of settling in, and chose sleep over doing anything else. It felt unremarkable in the best way, like she was letting the day land instead of carrying it forward.",
+      "activity": "Went home after dinner, took a quick shower, and fell asleep early with her phone on silent.",
+      "emotional_reaction": "calm, content, and lightly grateful for the quiet",
+      "salience": 0.31,
+      "location": "home",
+      "creates_memory": false,
+      "future_thread": null,
+      "thread_id": null,
+      "thread_progress": null,
+      "category": "rest",
+      "participants": []
+    },
+    {
+      "occurred_at": "2026-10-08T06:00:00-07:00",
+      "summary": "Mira used the early calm to take a small but encouraging step on her urban wildlife photo project, getting a couple of images she liked without turning the morning into an errand.",
+      "activity": "Went out at dawn for a short neighborhood walk with her camera and spent a few quiet minutes photographing a raccoon tracking along a fence and a pair of scrub jays in the first light before heading back home to get ready for work.",
+      "emotional_reaction": "calm, alert, and pleasantly motivated",
+      "salience": 0.43,
+      "location": "near home",
+      "creates_memory": true,
+      "future_thread": null,
+      "thread_id": "photo-project",
+      "thread_progress": "Mira spent an early dawn walk photographing urban wildlife and got a few promising images, which makes the photo project feel a little more real and gives her material to start organizing into a coherent series.",
+      "category": "interest",
+      "participants": []
+    },
+    {
+      "occurred_at": "2026-10-08T12:00:00-07:00",
+      "summary": "A solid midday shift moved the hawk from discharge prep to a plausible same-day release while the opossum stayed in observation, keeping the rehab casework steady and concrete.",
+      "activity": "At the wildlife center, Mira did the final afternoon release check on the hawk, watched its test flight with Jules, and signed off on a cautious release plan after confirming it was flying strongly and responding well to handling. She also glanced in on the young opossum and left updated notes for the next shift to keep observing appetite and stress before any decision was made.",
+      "emotional_reaction": "quietly satisfied, focused, and relieved to see real progress",
+      "salience": 0.68,
+      "location": "wildlife rehabilitation center",
+      "creates_memory": true,
+      "future_thread": null,
+      "thread_id": "work-rehab",
+      "thread_progress": "The hawk has passed its final release check and is now a plausible same-day release candidate after a strong test flight and calm handling; the young opossum remains in observation for at least one more day, with updated notes left for staff to keep reassessing appetite, stress, and readiness before any release decision.",
+      "category": "career",
+      "participants": [
+        "Jules"
+      ]
+    },
+    {
+      "occurred_at": "2026-10-08T18:00:00-07:00",
+      "summary": "After the relief of the hawk’s progress, Mira let the rest of the evening stay gentle: she ate something easy, got outside for a calm walk, and spent a little time with her camera shots without turning it into work.",
+      "activity": "Went home after the shift, made a simple dinner, and took a quiet evening walk before settling in with a camera card to look over a few of the day’s wildlife photos.",
+      "emotional_reaction": "content, unhurried, and pleasantly grounded",
+      "salience": 0.44,
+      "location": "home neighborhood",
+      "creates_memory": true,
+      "future_thread": null,
+      "thread_id": "life-balance",
+      "thread_progress": "Mira is still trying not to let demanding work crowd out rest, curiosity, and relationships, and this evening she chose a low-key routine after work: a simple dinner, a quiet walk, and a small, restorative look through her photos instead of diving back into center concerns.",
+      "category": "personal",
+      "participants": []
+    },
+    {
+      "occurred_at": "2026-10-09T00:00:00-07:00",
+      "summary": "After her calm evening, Mira chose an uncomplicated night of sleep at home instead of picking up any extra tasks or checking in on work again.",
+      "activity": "Went to bed after a quiet wind-down, leaving her phone on silent and sleeping deeply through the late night.",
+      "emotional_reaction": "settled, safe, and genuinely ready to rest",
+      "salience": 0.22,
+      "location": "home",
+      "creates_memory": false,
+      "future_thread": null,
+      "thread_id": null,
+      "thread_progress": null,
+      "category": "rest",
+      "participants": []
+    },
+    {
+      "occurred_at": "2026-10-09T06:00:00-07:00",
+      "summary": "Mira started the morning with a successful hawk release, then checked the still-observing opossum and left the case in good shape for staff coverage.",
+      "activity": "Went in early to the wildlife center and helped with the hawk’s final release, watching it take off cleanly after one last check while Jules handled the transport crate and paperwork. Afterward, Mira made a careful round past the opossum’s enclosure, confirmed it was still eating steadily, and left a brief update for the next shift before heading into the rest of her Friday.",
+      "emotional_reaction": "quietly pleased, focused, and a little uplifted by the clean release",
+      "salience": 0.71,
+      "location": "wildlife rehabilitation center",
+      "creates_memory": true,
+      "future_thread": null,
+      "thread_id": "work-rehab",
+      "thread_progress": "The hawk has now been released after a final early-morning check and clean takeoff, closing that case for Mira; the young opossum remains in observation for at least one more day, still eating well, with updated notes left for staff to keep reassessing appetite, stress, and readiness before any release decision.",
+      "category": "career",
+      "participants": [
+        "Jules"
+      ]
+    },
+    {
+      "occurred_at": "2026-10-09T12:00:00-07:00",
+      "summary": "Mira and Jules took a late lunch after the hawk’s release, and the easy conversation helped her settle into the rest of the day feeling lighter and more connected to the team.",
+      "activity": "Grabbed lunch with Jules at a small casual spot near the center after the morning release, letting themselves decompress over food and trading a few dry jokes about how much calmer the opossum case was behaving than either of them expected.",
+      "emotional_reaction": "relieved, pleasantly relaxed, and quietly appreciative of the company",
+      "salience": 0.46,
+      "location": "near the wildlife center",
+      "creates_memory": false,
+      "future_thread": null,
+      "thread_id": null,
+      "thread_progress": null,
+      "category": "social",
+      "participants": [
+        "Jules"
+      ]
+    },
+    {
+      "occurred_at": "2026-10-09T18:00:00-07:00",
+      "summary": "After the calm lunch with Jules and the morning release, Mira gave herself an easy Friday evening: she ate something simple, watched the neighborhood slow down around her, and took a quiet walk home feeling gently recharged instead of pulled back into work.",
+      "activity": "Went out alone for an early dinner at a small neighborhood restaurant, then took a slow walk afterward with no agenda beyond letting the workday settle.",
+      "emotional_reaction": "relaxed, quietly content, and glad she chose something restorative",
+      "salience": 0.41,
+      "location": "near home",
+      "creates_memory": false,
+      "future_thread": null,
+      "thread_id": "life-balance",
+      "thread_progress": "Mira is still trying not to let demanding work crowd out rest, curiosity, and relationships, and she chose another low-key Friday evening after work: an early dinner out alone, a quiet walk, and time to let the day settle instead of checking back into center concerns.",
+      "category": "personal",
+      "participants": []
+    },
+    {
+      "occurred_at": "2026-10-10T00:00:00-07:00",
+      "summary": "Mira ended the day with uncomplicated sleep, letting the calm from her dinner and walk carry over instead of reopening anything from the center.",
+      "activity": "Went to bed at home after her quiet Friday evening, turned her phone on silent, and slept through the late night without checking work.",
+      "emotional_reaction": "settled, restful, and mildly protective of her own downtime",
+      "salience": 0.24,
+      "location": "home",
+      "creates_memory": false,
+      "future_thread": null,
+      "thread_id": null,
+      "thread_progress": null,
+      "category": "rest",
+      "participants": []
+    },
+    {
+      "occurred_at": "2026-10-10T06:00:00-07:00",
+      "summary": "Mira woke into a slow Saturday and kept the morning intentionally unhurried: coffee, a simple breakfast, and a brief look through her camera shots gave her a calm start without pulling her into work mode.",
+      "activity": "Made coffee at home, ate a simple breakfast, and spent a few quiet minutes looking over a handful of wildlife photos on her laptop before stepping outside for fresh air.",
+      "emotional_reaction": "rested, steady, and quietly pleased to have the morning to herself",
+      "salience": 0.34,
+      "location": "home",
+      "creates_memory": false,
+      "future_thread": null,
+      "thread_id": "life-balance",
+      "thread_progress": "Mira is still trying not to let demanding work crowd out rest, curiosity, and relationships, and this Saturday morning she protected that balance by easing into the day at home with coffee, breakfast, and a few minutes of her photos instead of heading straight back into center concerns or obligations.",
+      "category": "personal",
+      "participants": []
+    },
+    {
+      "occurred_at": "2026-10-10T12:00:00-07:00",
+      "summary": "Mira used part of her Saturday to do a careful follow-up on the opossum case. The animal was still eating well but remained a little reactive to handling, so she and Jules updated the notes and agreed with Dr. Chen that it should stay in observation through at least the next day rather than being rushed toward release.",
+      "activity": "Went into the wildlife center for a midday check on the young opossum, helped review its appetite and stress signs with Jules, and discussed the next observation window with Dr. Elias Chen before leaving the case in continued monitoring.",
+      "emotional_reaction": "steady, professionally satisfied, and a little relieved that the case still had a clear, sensible plan",
+      "salience": 0.58,
+      "location": "wildlife rehabilitation center",
+      "creates_memory": true,
+      "future_thread": null,
+      "thread_id": "work-rehab",
+      "thread_progress": "The hawk remains closed out after its release, and the young opossum is still under observation after a midday reassessment showed good appetite but lingering handling stress. Mira, Jules, and Dr. Elias Chen agreed to continue monitoring through at least the next day, with updated notes left for staff and no release decision yet.",
+      "category": "career",
+      "participants": [
+        "Jules",
+        "Dr. Elias Chen"
+      ]
+    },
+    {
+      "occurred_at": "2026-10-10T18:00:00-07:00",
+      "summary": "After her center follow-up, Mira made good on staying connected and met Nina for a low-key dinner. They talked through ordinary life stuff, a few work frustrations, and Mira’s relief that the opossum still had a sensible monitoring plan, then walked a little before parting ways.",
+      "activity": "Met Nina for an early evening dinner and an easy walk afterward, catching up about their week while Mira let the opossum case sit until the next workday.",
+      "emotional_reaction": "warm, relaxed, and glad she had chosen people time instead of going straight home to drift back into work thoughts",
+      "salience": 0.57,
+      "location": "near home",
+      "creates_memory": true,
+      "future_thread": null,
+      "thread_id": "nina-friendship",
+      "thread_progress": "Mira followed through on making time for Nina again by meeting her for an easy dinner and walk after the Saturday center check-in. They caught up on each other’s weeks, Mira mentioned the opossum staying under observation for now, and they parted with the sense that they should keep finding small, regular windows like this instead of letting the connection slip again.",
+      "category": "social",
+      "participants": [
+        "Nina"
+      ]
+    },
+    {
+      "occurred_at": "2026-10-11T00:00:00-07:00",
+      "summary": "After seeing Nina, Mira kept the rest of the night deliberately low-key at home. She let the social energy settle, took a shower, and eased into bed early instead of checking back in on work or trying to make the evening more productive.",
+      "activity": "Stayed home after dinner, put her phone on silent, and spent the late evening winding down with a shower and a little quiet reading before bed.",
+      "emotional_reaction": "settled, private, and pleasantly unhurried",
+      "salience": 0.24,
+      "location": "home",
+      "creates_memory": false,
+      "future_thread": null,
+      "thread_id": null,
+      "thread_progress": null,
+      "category": "rest",
+      "participants": []
+    },
+    {
+      "occurred_at": "2026-10-11T06:00:00-07:00",
+      "summary": "Mira slept soundly and let the calm of the previous evening carry over into the new day without checking work or making plans before morning.",
+      "activity": "Slept at home through the early Sunday morning after a quiet night in.",
+      "emotional_reaction": "rested, settled, and quietly protected her downtime",
+      "salience": 0.22,
+      "location": "home",
+      "creates_memory": false,
+      "future_thread": null,
+      "thread_id": null,
+      "thread_progress": null,
+      "category": "rest",
+      "participants": []
+    },
+    {
+      "occurred_at": "2026-10-11T12:00:00-07:00",
+      "summary": "Mira used part of her Sunday to get outside with her camera instead of drifting back toward work. The walk was unhurried and low-stakes, but she came home with a couple of images that felt promising for her urban wildlife series, which gave the project a small but real sense of momentum.",
+      "activity": "Took a slow late-morning neighborhood walk with her camera, pausing to photograph a few ordinary urban birds and then spending a little time sorting the best shots at home.",
+      "emotional_reaction": "quietly energized, content, and glad to have done something for herself that still felt purposeful",
+      "salience": 0.49,
+      "location": "near home",
+      "creates_memory": true,
+      "future_thread": null,
+      "thread_id": "photo-project",
+      "thread_progress": "Mira’s urban wildlife photo project picked up a little more shape: after the early dawn shots she spent a slow Sunday late morning walking near home with her camera, noticed a few ordinary birds and small neighborhood wildlife, and came back with a couple of promising images to sort into the growing series.",
+      "category": "interest",
+      "participants": []
+    },
+    {
+      "occurred_at": "2026-10-11T18:00:00-07:00",
+      "summary": "Mira made herself a low-key Sunday dinner and used the time to check in with Nina about ordinary life things, the kind of small contact that kept the friendship feeling active without turning the evening into an event.",
+      "activity": "Cooked a simple dinner at home while talking with Nina on the phone for a short, easy catch-up.",
+      "emotional_reaction": "warm, calm, and pleasantly grounded by the easy conversation",
+      "salience": 0.33,
+      "location": "home",
+      "creates_memory": false,
+      "future_thread": null,
+      "thread_id": "nina-friendship",
+      "thread_progress": "Mira stayed connected with Nina through a brief, natural Sunday check-in while making dinner at home. They chatted about ordinary life and kept the door open for another easy get-together soon, reinforcing that their friendship can survive busy weeks when Mira makes room for small contact rather than waiting for a perfect stretch of free time.",
+      "category": "social",
+      "participants": [
+        "Nina"
+      ]
+    },
+    {
+      "occurred_at": "2026-10-12T00:00:00-07:00",
+      "summary": "Mira let the calm from her phone call with Nina carry into the night, showered and settled in at home, and chose real rest instead of drifting back toward center concerns.",
+      "activity": "Went to bed at home after the easy Sunday evening and fell asleep without checking work messages.",
+      "emotional_reaction": "settled, quietly protected, and pleasantly unwound",
+      "salience": 0.21,
+      "location": "home",
+      "creates_memory": false,
+      "future_thread": null,
+      "thread_id": null,
+      "thread_progress": null,
+      "category": "rest",
+      "participants": []
+    },
+    {
+      "occurred_at": "2026-10-12T06:00:00-07:00",
+      "summary": "Mira arrived for the early shift, reviewed the opossum’s overnight notes with Jules, and did a calm hands-on reassessment that showed steady appetite and less alarm than the day before. She left the case on continued observation, with no rush toward release.",
+      "activity": "Started the Monday morning at the wildlife center with Jules for a quick check on the young opossum before the day got busy, confirming it was still eating and a little tense with handling but otherwise stable.",
+      "emotional_reaction": "focused, professionally reassured, and glad the plan still felt measured",
+      "salience": 0.61,
+      "location": "wildlife rehabilitation center",
+      "creates_memory": true,
+      "future_thread": null,
+      "thread_id": "work-rehab",
+      "thread_progress": "The young opossum is still under observation at the wildlife center: Mira and Jules checked it again on Monday morning, found it eating well and medically stable but still somewhat reactive to handling, and kept the plan unchanged for continued monitoring rather than release. Dr. Elias Chen remains the senior veterinarian aligned with that cautious approach, and the next decision point is still pending after more observation and reassessment.",
+      "category": "career",
+      "participants": [
+        "Jules"
+      ]
+    },
+    {
+      "occurred_at": "2026-10-12T12:00:00-07:00",
+      "summary": "Mira completed the opossum follow-up work at the center, confirmed the cautious plan with Dr. Chen, and left the animal in continued observation rather than forcing a release decision.",
+      "activity": "Spent the early afternoon at the wildlife center finishing the opossum’s charting with Jules, then reviewed the case briefly with Dr. Elias Chen when he came through for rounds. They agreed the animal still looked medically stable but not quite relaxed enough for release, so Mira documented one more day of observation and then took a short breather outside before getting back to the rest of the shift.",
+      "emotional_reaction": "focused and reassured, with the steady feeling that careful restraint was still the right call",
+      "salience": 0.56,
+      "location": "wildlife rehabilitation center",
+      "creates_memory": true,
+      "future_thread": null,
+      "thread_id": "work-rehab",
+      "thread_progress": "The young opossum is still under observation at the wildlife center. After the Monday morning reassessment, Mira spent the early afternoon finishing charting with Jules and re-reviewed the case with Dr. Elias Chen during rounds; they kept the plan unchanged, with one more day of observation because the animal remains medically stable but still a bit too tense with handling for release.",
+      "category": "career",
+      "participants": [
+        "Jules",
+        "Dr. Elias Chen"
+      ]
+    },
+    {
+      "occurred_at": "2026-10-12T18:00:00-07:00",
+      "summary": "Mira ended Monday with something ordinary and restorative: a low-key meal, a slow walk, and no temptation to reopen the opossum chart once she was off the clock. The evening felt like a small but real choice to keep work in its place.",
+      "activity": "After leaving the wildlife center, Mira stopped for a simple dinner on the way home and then took a quiet evening walk around her neighborhood, letting the day’s careful work settle instead of carrying it back inside with her.",
+      "emotional_reaction": "calm, lightly relieved, and glad to have an unremarkable evening that still felt like hers",
+      "salience": 0.38,
+      "location": "near home",
+      "creates_memory": false,
+      "future_thread": null,
+      "thread_id": "life-balance",
+      "thread_progress": "Mira protected her off-duty balance on Monday evening by not extending the opossum case into her whole night. After the center shift she had a simple dinner and took a quiet neighborhood walk, using the downtime to stay grounded and keep the rest of her life separate from work pressures.",
+      "category": "personal",
+      "participants": []
+    },
+    {
+      "occurred_at": "2026-10-13T00:00:00-07:00",
+      "summary": "Mira ended the evening by settling into bed at home and letting herself fully clock out, choosing sleep over checking back on work or stretching the night any further.",
+      "activity": "Went home after the walk, showered, and turned in for the night with her phone left face down on the dresser.",
+      "emotional_reaction": "quietly content, safe in her own space, and pleasantly unburdened",
+      "salience": 0.28,
+      "location": "home",
+      "creates_memory": false,
+      "future_thread": null,
+      "thread_id": null,
+      "thread_progress": null,
+      "category": "rest",
+      "participants": []
+    },
+    {
+      "occurred_at": "2026-10-13T06:00:00-07:00",
+      "summary": "Mira stayed home, kept her phone out of reach, and got a full night of uninterrupted sleep after Monday’s quiet wind-down.",
+      "activity": "Slept at home through the night after showering and turning in early.",
+      "emotional_reaction": "quietly content, physically rested, and pleasantly unburdened",
+      "salience": 0.27,
+      "location": "home",
+      "creates_memory": false,
+      "future_thread": null,
+      "thread_id": null,
+      "thread_progress": null,
+      "category": "rest",
+      "participants": []
+    },
+    {
+      "occurred_at": "2026-10-13T12:00:00-07:00",
+      "summary": "Mira took a midday break to meet Nina for lunch at a small casual place, where they traded ordinary news, a few work complaints, and some good-natured teasing. The conversation left Mira feeling more connected and less like the week was already swallowing her whole.",
+      "activity": "Met Nina for a spontaneous lunch and an easy catch-up, then lingered a little over coffee before heading back out into the day.",
+      "emotional_reaction": "warm, relaxed, and quietly grateful for the uncomplicated company",
+      "salience": 0.52,
+      "location": "near home",
+      "creates_memory": true,
+      "future_thread": null,
+      "thread_id": "nina-friendship",
+      "thread_progress": "Mira and Nina kept their friendship active with a spontaneous Tuesday lunch and an easy conversation about ordinary life, work, and plans to check in again soon. Mira left feeling reminded that she can make room for Nina without needing a perfect free stretch, and they agreed to look for another low-key get-together later in the week.",
+      "category": "social",
+      "participants": [
+        "Nina"
+      ]
+    },
+    {
+      "occurred_at": "2026-10-13T18:00:00-07:00",
+      "summary": "After lunch with Nina, Mira went back to the wildlife center for another practical check on the opossum. The animal was still medically stable and eating, and this time tolerated handling a little better than before, enough that Mira felt comfortable documenting continued improvement without rushing the release decision. She and Jules updated the chart, and Dr. Chen agreed to keep the plan cautious for one more overnight observation.",
+      "activity": "Returned to the wildlife center for a late-afternoon reassessment of the young opossum with Jules, then sent a brief update to Dr. Elias Chen before heading out.",
+      "emotional_reaction": "professionally satisfied and quietly relieved, with enough caution left to avoid calling it done too early",
+      "salience": 0.64,
+      "location": "wildlife rehabilitation center",
+      "creates_memory": true,
+      "future_thread": null,
+      "thread_id": "work-rehab",
+      "thread_progress": "The young opossum remains under observation at the wildlife center, but the picture is improving: after the Tuesday lunch break, Mira and Jules did a late-afternoon reassessment that showed the animal still stable, still eating, and a little more tolerant of handling than before. Mira updated the chart and checked in with Dr. Elias Chen, and they agreed to continue cautiously rather than release it immediately; one more overnight observation is still planned before the next decision point.",
+      "category": "career",
+      "participants": [
+        "Jules",
+        "Dr. Elias Chen"
+      ]
+    },
+    {
+      "occurred_at": "2026-10-14T00:00:00-07:00",
+      "summary": "After the reassuring late-afternoon reassessment, Mira kept the rest of the evening deliberately ordinary: she headed home, made do with a simple dinner, showered, and got into bed while the opossum case was still left to overnight observation at the center.",
+      "activity": "Went home after the center shift, ate a simple late dinner, and turned in early without reopening the opossum case.",
+      "emotional_reaction": "quietly relieved and satisfied to let a good shift end without dragging work into the night",
+      "salience": 0.33,
+      "location": "home",
+      "creates_memory": false,
+      "future_thread": null,
+      "thread_id": null,
+      "thread_progress": null,
+      "category": "rest",
+      "participants": []
+    }
+  ],
+  "memories_created": 13,
+  "threads": [
+    {
+      "id": "work-rehab",
+      "category": "career",
+      "title": "Rehabilitation cases",
+      "summary": "The young opossum remains under observation at the wildlife center, but the picture is improving: after the Tuesday lunch break, Mira and Jules did a late-afternoon reassessment that showed the animal still stable, still eating, and a little more tolerant of handling than before. Mira updated the chart and checked in with Dr. Elias Chen, and they agreed to continue cautiously rather than release it immediately; one more overnight observation is still planned before the next decision point.",
+      "status": "active",
+      "importance": 0.85,
+      "last_progress_at": "2026-10-13T18:00:00-07:00"
+    },
+    {
+      "id": "photo-project",
+      "category": "interest",
+      "title": "Urban wildlife photo project",
+      "summary": "Mira’s urban wildlife photo project picked up a little more shape: after the early dawn shots she spent a slow Sunday late morning walking near home with her camera, noticed a few ordinary birds and small neighborhood wildlife, and came back with a couple of promising images to sort into the growing series.",
+      "status": "active",
+      "importance": 0.55,
+      "last_progress_at": "2026-10-11T12:00:00-07:00"
+    },
+    {
+      "id": "nina-friendship",
+      "category": "social",
+      "title": "Stay connected with Nina",
+      "summary": "Mira and Nina kept their friendship active with a spontaneous Tuesday lunch and an easy conversation about ordinary life, work, and plans to check in again soon. Mira left feeling reminded that she can make room for Nina without needing a perfect free stretch, and they agreed to look for another low-key get-together later in the week.",
+      "status": "active",
+      "importance": 0.65,
+      "last_progress_at": "2026-10-13T12:00:00-07:00"
+    },
+    {
+      "id": "life-balance",
+      "category": "personal",
+      "title": "Protect a life outside work",
+      "summary": "Mira protected her off-duty balance on Monday evening by not extending the opossum case into her whole night. After the center shift she had a simple dinner and took a quiet neighborhood walk, using the downtime to stay grounded and keep the rest of her life separate from work pressures.",
+      "status": "active",
+      "importance": 0.7,
+      "last_progress_at": "2026-10-12T18:00:00-07:00"
+    }
+  ],
+  "threads_progressed": [
+    "life-balance",
+    "nina-friendship",
+    "photo-project",
+    "work-rehab"
+  ],
+  "ongoing_threads": []
+}
