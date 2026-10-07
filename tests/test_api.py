@@ -22,7 +22,11 @@ class StubDeliberator:
 
 def test_health():
     client = TestClient(api.app)
-    assert client.get("/health").json() == {"status": "ok"}
+    response = client.get("/health")
+    assert response.status_code == 200
+    assert response.json()["status"] == "ok"
+    assert response.json()["process_id"]
+    assert response.json()["persistence"] in {"ready", "disabled"}
 
 
 def test_deliberate_endpoint(monkeypatch):
@@ -43,3 +47,4 @@ def test_deliberate_endpoint(monkeypatch):
         "intent": None,
         "next_wakeup_minutes": 45,
     }
+
