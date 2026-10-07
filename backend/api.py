@@ -145,6 +145,16 @@ def optional_startup_behavior_experiment() -> None:
         logger.exception("BEHAVIOR_EXPERIMENT_FAILED")
 
 
+@app.on_event("startup")
+def optional_startup_life_experiment() -> None:
+    if os.getenv("RUN_LIFE_EXPERIMENT_ON_STARTUP", "").lower() not in {"1", "true", "yes"}:
+        return
+    try:
+        run_life_simulation()
+    except Exception:
+        logger.exception("LIFE_SIMULATION_FAILED")
+
+
 @app.get("/")
 def root() -> dict[str, str]:
     return {"service": "AI is LOVE", "status": "ok"}
