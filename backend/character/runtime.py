@@ -3,6 +3,8 @@ from datetime import datetime
 
 from backend.character.models import (
     CharacterProfile,
+    LifeState,
+    LivedExperience,
     Memory,
     MentalState,
     RelationshipEvidence,
@@ -18,6 +20,7 @@ class CharacterRuntime:
     mental: MentalState = field(default_factory=MentalState)
     memories: list[Memory] = field(default_factory=list)
     relationship_evidence: list[RelationshipEvidence] = field(default_factory=list)
+    life: LifeState = field(default_factory=LifeState)
 
     def advance_internal_time(self, now: datetime, elapsed_hours: float) -> None:
         # Absence can increase longing without forcing action.
@@ -26,6 +29,20 @@ class CharacterRuntime:
 
     def remember(self, memory: Memory) -> None:
         self.memories.append(memory)
+
+    def experience(self, event: LivedExperience) -> None:
+        self.life.current_activity = event.activity
+        self.life.recent_experiences.append(event)
+        self.life.recent_experiences = self.life.recent_experiences[-30:]
+        if event.future_thread and event.future_thread not in self.life.ongoing_threads:
+            self.life.ongoing_threads.append(event.future_thread)
+        if event.creates_memory:
+            self.remember(Memory(
+                content=event.summary,
+                occurred_at=event.occurred_at,
+                importance=event.salience,
+                emotional_weight=min(1.0, max(-1.0, event.salience)),
+            ))
 
     def record_relationship_evidence(self, evidence: RelationshipEvidence) -> None:
         self.relationship_evidence.append(evidence)
