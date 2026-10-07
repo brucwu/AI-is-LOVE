@@ -130,7 +130,7 @@ def test_life_api_runs_28_slices_with_persistent_runtime(monkeypatch, method):
     assert body["events"][0]["participants"] == ["Jules"]
     times = [datetime.fromisoformat(e["occurred_at"]) for e in body["events"]]
     assert all(b - a == timedelta(hours=6) for a, b in zip(times, times[1:]))
-    assert all(c["payload"]["life_identity"]["profession"] == "wildlife rescue veterinarian" for c in models[0].calls)
+    assert all(c["payload"]["life_identity"]["profession"] == "野生動物救援獸醫" for c in models[0].calls)
 
 
 def test_pending_checkpoint_persists_and_reaches_next_director_call():
@@ -164,3 +164,21 @@ def test_unknown_thread_cannot_install_checkpoint():
     applied = rt.experience(event(thread_id="invented", thread_next_step="Overwrite life", thread_next_step_in_hours=24))
     assert [asdict(t) for t in rt.life.threads] == before
     assert applied.thread_next_step is None
+
+
+def test_chinese_experience_persists_and_reaches_next_call_without_translation():
+    rt = runtime()
+    lived = event(summary="和 Jules 看完負鼠的進食紀錄，總算能往下一步走了。",
+                  activity="確認康復進度", emotional_reaction="鬆了口氣，但還想再確認體重。",
+                  thread_progress="負鼠已開始自主進食，明天和 Jules 複查體重。",
+                  thread_next_step="和 Jules 複查體重", thread_next_step_in_hours=24)
+    rt.experience(lived)
+    model = RecordingModel()
+    LLMLifeDirector(model).advance(rt, NOW + timedelta(hours=6))
+    payload = model.calls[0]["payload"]
+    assert payload["recent_memories"][0]["content"] == lived.summary
+    assert payload["mental_state"]["mood"] == lived.emotional_reaction
+    assert payload["active_life_threads"][0]["summary"] == lived.thread_progress
+    assert payload["active_life_threads"][0]["next_step"] == lived.thread_next_step
+    assert payload["active_life_threads"][0]["id"] == "work-rehab"
+    assert json.loads(json.dumps(payload, ensure_ascii=False)) == payload

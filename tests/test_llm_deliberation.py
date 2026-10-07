@@ -45,3 +45,12 @@ def test_llm_can_choose_act_with_genuine_intent():
     assert result.decision is Decision.ACT
     assert result.intent == "ask how the event went"
     assert model.calls
+
+
+def test_chinese_intent_and_reason_survive_structured_deliberation():
+    model = StubModel({"decision": "ACT", "reason": "想到他今天很累，想問他到家了沒。",
+                       "intent": "問他到家了沒，讓他知道我惦記著他。", "next_wakeup_minutes": 90})
+    result = LLMDeliberator(model).deliberate(make_runtime())
+    assert result.reason == model.result["reason"]
+    assert result.intent == model.result["intent"]
+    assert result.decision is Decision.ACT
