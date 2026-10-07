@@ -69,3 +69,8 @@ v0 demonstrated continuity but kept Mira effectively indoors organizing an apart
 ## Recommended next step
 
 Preserve this v1 checkpoint. Next, implement durable Runtime persistence and structured commitment/experience records so life survives restarts and factual/timing continuity can be checked across longer runs; then connect the background life loop. Keep the existing personality/love design and defer World Grounding. Before choosing a broader life-emotional style or stronger conflict/novelty policy, ask the user for that product decision. A subsequent regression experiment should evaluate longer-lived plans, actual release handoffs, distinct social perspectives and off-duty location breadth without enforcing category quotas or introducing melodrama.
+
+
+## Final artifact-deployment recovery
+
+Adding this evidence directory exposed implicit setuptools package discovery: the documentation deployment `a058ff9c3973207042d2535a440d5940de2a1c13` failed because both `backend` and `experiments` were detected as top-level packages. The existing tested v1 service stayed live. Commit `827de248ab70296a237b9c29a298576b436e372e` restricts package discovery to backend, builds a wheel successfully with experiments/tests excluded, and passes all 28 tests. Render deployment `dep-db3bcojl550s73cr0su0` was verified live at `2026-10-07T21:16:14.432121Z`. This changed packaging only; experiment behavior and evidence are unchanged, so no additional paid rerun was needed.

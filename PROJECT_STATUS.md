@@ -380,7 +380,9 @@ Continued directly from `main` at `039e76df2ebc1071295f606adeb149b88c0e6151`, af
 - `f22cd1ace61cb309d326a9e262f9568593d0ee6d` — completed v1 Director, initialized Life Identity/structured threads in the API, added inspectable progression and tests.
 - `7c946c1ac710d39f3a3f8f50fb98a00a7088d9cc` — engineering iteration after run 1: concrete timed thread checkpoints and professional-realism/stagnation correction.
 - `c93e07b8d052ce1129295490a6da04e0aa856c3a` — both experiment traces, computed metrics and full analysis in `experiments/life-v1/`.
-- This final Project Status commit follows the evidence commit and records the completed checkpoint; use GitHub history to obtain its SHA.
+- `a058ff9c3973207042d2535a440d5940de2a1c13` — initial completed Project Status handoff; its deployment exposed the packaging issue documented below.
+- `827de248ab70296a237b9c29a298576b436e372e` — explicit backend-only Python package discovery and build configuration, preserving the tested Life Director behavior.
+- This final recovery/status commit follows the packaging fix; use GitHub history to obtain its SHA.
 
 ### Final implementation
 
@@ -457,3 +459,14 @@ Remaining weaknesses:
 ### Recommended next step
 
 Keep this checkpoint and implement durable Runtime persistence plus structured commitment/experience records, then connect the background life loop. Use the preserved traces as regression references for longer-lived plans, release handoffs, social perspectives and off-duty breadth. Preserve personality-driven behavior, stable love and WAIT. Do not impose rigid category rotation or add forced conflict/emergencies. Ask the user before making major life-style/emotional-direction decisions; World Grounding remains a later layer.
+
+
+### Final deployment packaging recovery — 2026-10-07
+
+The final documentation/evidence deployment at `a058ff9c3973207042d2535a440d5940de2a1c13` failed to build (`dep-db3bbujrjlhs738f0cj0`). Render logs showed: `Multiple top-level packages discovered in a flat-layout: ['backend', 'experiments']`. Adding the experiment evidence directory exposed implicit setuptools discovery. The prior tested v1 deployment remained live and healthy throughout.
+
+Fixed `pyproject.toml` with explicit setuptools build configuration and package discovery restricted to `backend` and `backend.*` in commit `827de248ab70296a237b9c29a298576b436e372e`.
+
+Actually executed `pip wheel . --no-deps --wheel-dir /workspace/scratch/51b54a0a0bce/wheels` successfully, inspected the wheel to confirm backend API/Director were included and experiments/tests excluded, and reran `python -m pytest -q`: **28 passed**, 2 existing deprecation warnings. `git diff --check` passed. Render deployment `dep-db3bcojl550s73cr0su0` for `827de248ab70296a237b9c29a298576b436e372e` was then verified **live**, finished `2026-10-07T21:16:14.432121Z`.
+
+No behavior code or experiment data changed in the packaging recovery, so the two previously verified deployed experiments remain the evidence for Life Director v1; no additional paid experiment was run. This final status-only update is auto-deployed from main and will be checked after publication.
