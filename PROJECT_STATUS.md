@@ -1,8 +1,8 @@
 # AI is LOVE — Project Status
 
-_Last updated: 2026-10-07_
+_Last updated: 2026-10-08 UTC (2026-10-07 California)_
 
-**Current checkpoint: Life Director v1 is implemented, tested, deployed and exercised in two real seven-day / 28-slice runs.** Read **Life Director v1 Completed Checkpoint** at the end for current results and next steps. Earlier sections preserve historical snapshots; their old immediate-next-step instructions are superseded by this completed checkpoint. Persistence across restarts and an autonomous background life loop are still not implemented.
+**Current checkpoint: private web chat MVP is connected to persistent Mira, following the completed Life Director v1, PostgreSQL persistence and bounded autonomy loop.** Read the newest checkpoint at the end; historical sections below are preserved evidence and their pending tasks may have been superseded.
 
 This file is the canonical handoff checkpoint for continuing the project across ChatGPT sessions. Read this before making changes.
 
@@ -30,12 +30,12 @@ The player should feel that they met a person, not that they configured an ideal
 
 Responsive Web App target hosted on Render:
 
-- Frontend: not yet implemented.
+- Frontend: private single-player responsive chat page at `/` (API 0.7.0).
 - Python Character Runtime API: initial implementation exists.
 - Deliberation layer: deterministic baseline plus LLM-backed implementation.
 - Model gateway: OpenAI Responses API behind a provider-neutral interface.
-- Persistence/Postgres: not implemented yet.
-- Background worker/heartbeat: not implemented yet.
+- Persistence/Postgres: complete Runtime snapshots, conversation turns and optimistic concurrency; connected to Render PostgreSQL.
+- Background life/cognition loop: enabled with durable wake reservations and daily opportunity budget; pauses during free Render sleep.
 - Simulation/report tooling: baseline implementation exists.
 
 Important: the current /deliberate endpoint creates a fresh CharacterRuntime per request. It is a cognition test harness, **not persistent character state**.
@@ -548,3 +548,38 @@ Continued from existing Life Director v1 and PostgreSQL implementation; no ident
 - Free Render web-service sleep pauses this in-process loop. It cannot provide continuous independent life while the service is asleep. No self-pinging workaround was added. The configured free PostgreSQL validation instance expires November 6, 2026; durable production storage needs a plan decision before then.
 - Live autonomous cognition and persistence are exercised; the autonomous six-hour life branch is covered by tests but still awaits a naturally due live tick. No extra experiment/model batch was run just to manufacture that evidence.
 - Next product/hosting decision: always-on hosting/background execution and durable database plan. Then observe several natural life/ACT/WAIT cycles before designing player-facing intention delivery. Structured commitment lifecycle/calendar validation and World Grounding remain outstanding.
+
+
+## Private single-player chat MVP — 2026-10-08 UTC
+
+### Changes and authority
+
+Implementation `3034a52921100c6e87bdd869ea98e6fa0a739ee7` continues the existing Mira; no identity/thread or database reset. API 0.7.0.
+
+- `/` now serves a responsive Traditional Chinese chat page. It requires a chat-only test passcode, keeps credentials only in page memory, and renders all dialogue via textContent. No token in URL/localStorage/source. Browser refresh requires signing in again and restores persisted conversation.
+- Authenticated GET/POST `/chat` use separate CHAT_ACCESS_TOKEN; this credential grants no `/runtime/mira` access. Provisioned through Render merge without reading or changing the database URL, runtime admin token or OpenAI key. Passcode is not recorded in source/evidence. Single-player prototype, not multi-user account/session management.
+- Separate typed conversation turns persist within the full runtime snapshot alongside existing structured memories. Client request IDs make retries idempotent. A reserved unanswered turn blocks a second player message; retry recovers failed or expired generation without duplicating the player message. A late old process cannot overwrite a newer response.
+- A reply is merged with the newest snapshot using optimistic revisions, preserving concurrent life/autonomy updates. Provider response contains only reply text; it cannot rewrite identity, relationship, memories or threads.
+- Expression receives profile, life identity, recent lived experiences, structured memories, local time, relationship and recent 20 conversation turns. Deliberation now also receives the conversation, so it knows that contact happened. Natural Chinese reply prompt respects relationship stage and avoids inventing shared history/grounded world facts.
+- Conversation storage is durable; this does NOT implement semantic extraction of long-term player facts or reciprocal relationship evidence. Recent name recall is dialogue-context evidence, not proof of long-term memory beyond the context window.
+
+### Tests actually run
+
+`python -m pytest -q`: **50 passed**, eight existing on_event deprecation warnings. New tests verify duplicate IDs/saved replies/reopened storage, payload mismatch, failed-provider recovery, overlapping/new turns, expired lease/late owner, concurrent life mutation preservation, Chinese context in expression and cognition, API authentication/input/safe errors and scoped credentials. Existing Life Director/thread/memory/loop tests remain passing.
+
+`python -m pip wheel . --no-deps --wheel-dir /workspace/scratch/51b54a0a0bce/wheels -q`: succeeded. `node --check` on extracted chat JavaScript: passed. `git diff --check`: passed.
+
+### Deployment and live validation
+
+Render deploy `dep-db3h8rtchlcc73ecbbng` for implementation 3034a52 verified live at 2026-10-08T03:58:12.893874Z. PostgreSQL restored Mira revision 4 and the previous WAIT/wake reservation in process 8401169c-4103-4fe4-b146-119f461d002e.
+
+After confirming that deployment, HTTP OpenAPI verified 0.7.0 and two real model-backed chat turns succeeded. Mira greeted 阿布, then recalled the exact introduction in the following turn. Replaying the first request returned an identical saved response. GET /chat without credentials returned 401; the chat credential was also rejected by the runtime-admin API (401). Two turns were persisted. Trace: `experiments/chat-mvp/live-smoke.json`, without credentials. These are explicit engineering test messages in Mira's development conversation. No additional seven-day experiment was run.
+
+Browser access to the Render URL returned ERR_BLOCKED_BY_CLIENT. HTTP access succeeds; no visual or browser-interaction verification is claimed.
+
+### Remaining MVP steps
+
+- Convert appropriate autonomous ACT intentions into persisted player-facing inbox messages, with delivery/read continuity and duplicate protection. Existing ACT remains private intention; no proactive visible messages or push delivery yet.
+- Design and validate selective player-fact/shared-experience memory and reciprocal evidence, without treating every exchange as relationship XP.
+- Observe naturally due live autonomous Life Thread advancement; retain WAIT and personality-driven timing. Always-on worker/database plan remains a user billing decision; free service sleep still pauses the loop and free validation database expires November 6, 2026.
+- Multi-user authentication, pagination, history/context management, production rate/token budgets and actual mobile browser verification remain outstanding. This is a testable single-player chat checkpoint, not a completed public-production romance MVP.

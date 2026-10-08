@@ -1,0 +1,22 @@
+{
+  "implementation_commit": "3034a52921100c6e87bdd869ea98e6fa0a739ee7",
+  "first": {
+    "id": "mvp-fd935262-4e68-4800-b124-54f767097d7e",
+    "player_text": "你好 Mira，我叫阿布。今天想來跟你聊聊。",
+    "received_at": "2026-10-08T03:58:55.066345+00:00",
+    "reply": "嗨阿布，歡迎來聊聊 🙂 我是 Mira。今天過得怎麼樣？",
+    "replied_at": "2026-10-08T03:58:59.889447+00:00"
+  },
+  "second": {
+    "id": "mvp-c08f7c7f-180c-4683-bd38-7cad5a1b5c78",
+    "player_text": "你還記得我剛剛怎麼介紹自己嗎？",
+    "received_at": "2026-10-08T03:59:13.724752+00:00",
+    "reply": "記得呀，你剛剛說你叫阿布，還說今天想來跟我聊聊 🙂",
+    "replied_at": "2026-10-08T03:59:15.377187+00:00"
+  },
+  "duplicate_equal": true,
+  "chat_unauthorized_status": 401,
+  "chat_token_admin_status": 401,
+  "name_continuity": true,
+  "history_count": 2
+}
