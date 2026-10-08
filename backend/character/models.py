@@ -137,3 +137,14 @@ class AutonomyState:
     last_decision: str | None = None
     last_reason: str | None = None
     proposed_intent: str | None = None
+
+
+@dataclass
+class ChatTurn:
+    id: str
+    player_text: str
+    received_at: datetime
+    reply: str | None = None
+    replied_at: datetime | None = None
+    lease_until: datetime | None = None
+    owner: str | None = None

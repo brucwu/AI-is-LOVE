@@ -5,6 +5,7 @@ from zoneinfo import ZoneInfo
 from typing import Protocol
 
 from backend.character.models import Decision, DeliberationResult
+from backend.chat.service import conversation_context
 
 
 class StructuredModel(Protocol):
@@ -47,6 +48,7 @@ class LLMDeliberator:
             "previous_internal_decision": {"decision": runtime.autonomy.last_decision,
                 "reason": runtime.autonomy.last_reason, "intent": runtime.autonomy.proposed_intent,
                 "delivered": False},
+            "recent_conversation": conversation_context(runtime),
             "character": asdict(runtime.profile),
             "relationship": asdict(runtime.relationship),
             "mental_state": {

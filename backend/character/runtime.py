@@ -3,6 +3,7 @@ from datetime import datetime, timedelta
 
 from backend.character.models import (
     AutonomyState,
+    ChatTurn,
     CharacterProfile,
     LifeState,
     LifeThread,
@@ -24,6 +25,8 @@ class CharacterRuntime:
     relationship_evidence: list[RelationshipEvidence] = field(default_factory=list)
     life: LifeState = field(default_factory=LifeState)
     autonomy: AutonomyState = field(default_factory=AutonomyState)
+
+    conversation: list[ChatTurn] = field(default_factory=list)
 
     def advance_internal_time(self, now: datetime, elapsed_hours: float) -> None:
         self.relationship.longing = min(1.0, self.relationship.longing + 0.08 * elapsed_hours)

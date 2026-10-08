@@ -8,6 +8,9 @@ import secrets
 from uuid import uuid4
 
 from fastapi import FastAPI, Header, HTTPException, Depends
+from fastapi.responses import HTMLResponse
+from backend.chat.service import ChatComposer, ChatBusy, RequestMismatch, send_message, public_turn
+from backend.chat.page import CHAT_PAGE
 from pydantic import BaseModel, Field
 
 from backend.character.models import CharacterProfile, LifeState, Memory, RelationshipStage, RelationshipState
@@ -20,7 +23,7 @@ from backend.autonomy.loop import LifeLoop
 from backend.persistence.service import initialize_database
 from backend.persistence.store import RuntimeStore, ConflictError, encode
 
-app = FastAPI(title="AI is LOVE", version="0.6.0")
+app = FastAPI(title="AI is LOVE", version="0.7.0")
 logger = logging.getLogger("ai_is_love.behavior")
 PROCESS_ID = str(uuid4())
 
@@ -239,9 +242,54 @@ def optional_startup_behavior_experiment() -> None:
         logger.exception("BEHAVIOR_EXPERIMENT_FAILED")
 
 
-@app.get("/")
-def root() -> dict[str, str]:
-    return {"service": "AI is LOVE", "status": "ok"}
+@app.get("/", response_class=HTMLResponse)
+def root():
+    return CHAT_PAGE
+
+
+def authorize_chat(authorization: str | None = Header(default=None)):
+    token = os.getenv("CHAT_ACCESS_TOKEN")
+    if not token or not os.getenv("DATABASE_URL"):
+        raise HTTPException(503, "Chat access is not configured")
+    if not secrets.compare_digest(authorization or "", "Bearer " + token):
+        raise HTTPException(401, "Unauthorized")
+
+
+class ChatRequest(BaseModel):
+    request_id: str = Field(pattern=r"^[a-zA-Z0-9_-]{8,80}$")
+    text: str = Field(min_length=1, max_length=2000)
+
+
+@app.get("/chat", dependencies=[Depends(authorize_chat)])
+def chat_history():
+    store = RuntimeStore(os.environ["DATABASE_URL"])
+    try:
+        runtime, revision = store.load("mira")
+        if runtime is None:
+            raise HTTPException(404, "Character not found")
+        return {"character": runtime.profile.name, "turns": [public_turn(t) for t in runtime.conversation]}
+    finally:
+        store.close()
+
+
+def chat_composer():
+    from openai import OpenAI
+    return ChatComposer(OpenAIStructuredModel(client=OpenAI(timeout=60, max_retries=0)))
+
+
+@app.post("/chat", dependencies=[Depends(authorize_chat)])
+def chat_send(request: ChatRequest):
+    try:
+        return send_message(os.environ["DATABASE_URL"], request.request_id, request.text, chat_composer())
+    except ChatBusy:
+        raise HTTPException(409, "Reply in progress; retry the same message")
+    except RequestMismatch:
+        raise HTTPException(409, "Request ID already used")
+    except ValueError:
+        raise HTTPException(422, "Invalid message or reply")
+    except Exception:
+        logger.error("CHAT_REPLY_FAILED")
+        raise HTTPException(502, "Reply unavailable; retry the same message")
 
 
 @app.get("/health")
