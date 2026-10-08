@@ -18,5 +18,11 @@
   "chat_unauthorized_status": 401,
   "chat_token_admin_status": 401,
   "name_continuity": true,
-  "history_count": 2
+  "history_count": 2,
+  "restart_validation": {
+    "commit": "e6ad70a7bdcfdfc2b62d6ce031033b4e2f2d91bb",
+    "process_id": "841b06da-2347-4cf3-91ee-b4a7c8d2dcd2",
+    "identical_two_turns": true,
+    "restored_revision": 8
+  }
 }

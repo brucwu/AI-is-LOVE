@@ -575,6 +575,8 @@ Render deploy `dep-db3h8rtchlcc73ecbbng` for implementation 3034a52 verified liv
 
 After confirming that deployment, HTTP OpenAPI verified 0.7.0 and two real model-backed chat turns succeeded. Mira greeted 阿布, then recalled the exact introduction in the following turn. Replaying the first request returned an identical saved response. GET /chat without credentials returned 401; the chat credential was also rejected by the runtime-admin API (401). Two turns were persisted. Trace: `experiments/chat-mvp/live-smoke.json`, without credentials. These are explicit engineering test messages in Mira's development conversation. No additional seven-day experiment was run.
 
+Real replacement-process verification: evidence deploy `dep-db3hafqjnfac738brda0` at e6ad70a7bdcfdfc2b62d6ce031033b4e2f2d91bb was verified live (2026-10-08T04:00:56.660111Z). Startup logged Mira revision 8, restored=true, new process `841b06da-2347-4cf3-91ee-b4a7c8d2dcd2`. HTTP /health independently confirmed that new process; authenticated GET /chat returned both turns exactly equal to the pre-restart saved JSON, including player text, replies, IDs and timestamps. Restart evidence is appended to the trace. Deployed HTML/content type and chat controls were verified by HTTP; this is not a visual test.
+
 Browser access to the Render URL returned ERR_BLOCKED_BY_CLIENT. HTTP access succeeds; no visual or browser-interaction verification is claimed.
 
 ### Remaining MVP steps
