@@ -518,3 +518,33 @@ PR #2 merged (01d12bd); runtime integration and subsequent PostgreSQL transactio
 - GET /runtime/mira and POST /runtime/mira/life are wired to durable storage and protected by RUNTIME_API_TOKEN. Token has NOT yet been provisioned; these endpoints intentionally return 503 until configured. Their live authenticated use and LLM life mutation remain untested. Existing /experiments endpoints remain stateless.
 - No autonomous scheduler/background life loop has been added. Next: provision runtime authentication, validate one authorized life advance plus restore, then implement the cost-aware wake-up loop on the chosen hosting plan.
 - Direct browser access to the public app was blocked by client network policy; health success and process restore were verified through Render deploy metadata and application logs. Read-only SQL MCP cannot connect because external database traffic is disabled; private app connection succeeded, without loosening network access.
+
+
+## Durable autonomous life/cognition loop — 2026-10-08
+
+Continued from existing Life Director v1 and PostgreSQL implementation; no identity/thread reset and no new seven-day simulation. The earlier experiment evidence remains valid for the unchanged Director. This checkpoint connects the real persisted Mira to a bounded background loop.
+
+### Implementation and commits
+
+- `fc919705a7bcd0c1de74a24eef6b40130ac82900`: additive durable AutonomyState, restart-safe wake reservations, six-hour life opportunities, internal ACT/WAIT decisions, optimistic concurrency and startup/shutdown integration; API 0.6.0.
+- `c1fa64c24cfb511181e01cc26333c0b6fa487ab2`: deliberation receives Southern California local time, four recent lived experiences, current activity and the previous explicitly undelivered internal intention. Native Traditional Chinese remains in place.
+- A tick persists a reservation before calling the model. Failed calls consume an opportunity and leave a 20-minute retry lease; restart does not replay all missed intervals. A concurrent manual/player save prevents stale generated results overwriting current state. This is not an exactly-once provider-call guarantee.
+- Life advancement is due at least six hours after the prior recorded life experience. Cognition chooses wake intervals with jitter, bounded to 30–360 minutes. The daily limit is eight opportunities per UTC day, at most two model calls per opportunity (life plus cognition); this is a call budget, not a monetary/token cap.
+- ACT stores an internal proposed intention only. No outbound player messages, push delivery or message queue has been implemented. WAIT remains a valid result. Older snapshots missing AutonomyState decode with defaults.
+- Render merges only AUTONOMY_ENABLED=true and AUTONOMY_DAILY_LIMIT=8. DATABASE_URL, RUNTIME_API_TOKEN and OPENAI_API_KEY were not retrieved or modified. Existing free web service is used; no paid worker or hosting-plan change.
+
+### Actually executed validation
+
+- `python -m pytest -q`: **43 passed**, eight FastAPI on_event deprecation warnings. A bare `pytest` command was unavailable on PATH; the Python-module command succeeded.
+- Tests include durable WAIT state and memories across reopened connections, ACT without delivery, budget exhaustion, missed-day behavior, provider failure reservations, concurrent manual writes, overlapping loop attempts, old snapshot compatibility, and Chinese cognition context/local time. Existing identity/thread/memory/API/persistence tests still pass.
+- `python -m pip wheel . --no-deps --wheel-dir /workspace/scratch/51b54a0a0bce/wheels -q`: succeeded. `git diff --check`: passed.
+- Runtime token provisioning and one authenticated life mutation occurred in the preceding user-authorized session. This turn independently observed Render PostgreSQL startup restoration of Mira revision 2; it did not repeat or claim a new authenticated manual mutation. The previous token-not-provisioned note above is superseded.
+- Deploy `dep-db3h3atchlcc73ec7in0` for fc91970 verified live at 2026-10-08T03:46:31Z. First autonomous model-backed tick at 03:46:35Z: revision 4, WAIT, attempts_today=1, next wake 2026-10-08T06:56:29.178491+00:00, delivery none. Life advancement was false because the six-hour life interval was not yet due; do not cite this tick as live autonomous Life Thread progression.
+
+- Deploy `dep-db3h4gbl550s73agmju0` for c1fa64c verified live at 2026-10-08T03:48:10.611Z. A distinct process `7aa79b5f-9ed1-4625-85d0-b189aa720ec4` logged PostgreSQL restoration and AUTONOMY_RESTORED at 03:48:04Z: revision 4, attempts_today 1, last_decision WAIT, identical next_wakeup_at 06:56:29.178491Z. It retained the completed autonomous decision without consuming another opportunity on startup. The previous process was db4ba4a5-f516-45cb-84a4-72e38c37467f.
+
+### Limits and next step
+
+- Free Render web-service sleep pauses this in-process loop. It cannot provide continuous independent life while the service is asleep. No self-pinging workaround was added. The configured free PostgreSQL validation instance expires November 6, 2026; durable production storage needs a plan decision before then.
+- Live autonomous cognition and persistence are exercised; the autonomous six-hour life branch is covered by tests but still awaits a naturally due live tick. No extra experiment/model batch was run just to manufacture that evidence.
+- Next product/hosting decision: always-on hosting/background execution and durable database plan. Then observe several natural life/ACT/WAIT cycles before designing player-facing intention delivery. Structured commitment lifecycle/calendar validation and World Grounding remain outstanding.
