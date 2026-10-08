@@ -585,3 +585,12 @@ Browser access to the Render URL returned ERR_BLOCKED_BY_CLIENT. HTTP access suc
 - Design and validate selective player-fact/shared-experience memory and reciprocal evidence, without treating every exchange as relationship XP.
 - Observe naturally due live autonomous Life Thread advancement; retain WAIT and personality-driven timing. Always-on worker/database plan remains a user billing decision; free service sleep still pauses the loop and free validation database expires November 6, 2026.
 - Multi-user authentication, pagination, history/context management, production rate/token budgets and actual mobile browser verification remain outstanding. This is a testable single-player chat checkpoint, not a completed public-production romance MVP.
+
+
+## Proactive chat inbox — 2026-10-08
+
+API 0.8.0 connects autonomous ACT to ChatComposer and durable conversation entries (origin=mira). WAIT does not call expression or publish. Proactive entries have no fabricated player message, appear in the existing chat history, and are included in later reply/deliberation context. Open chat polls every 15 seconds while visible. This is persisted web inbox delivery, not OS push or read receipts.
+
+Expression, cognition and life changes publish together with optimistic revision checks. Concurrent player updates discard stale proactive output. A saved wake reservation prevents immediate replay after restart; generation failure leaves the 20-minute reservation and consumes the opportunity, rather than promising exactly-once model calls. No historical private ACT intent is replayed. Pending unanswered player turns suppress proactive expression for that opportunity.
+
+Actual local validation: 53 tests passed, including ACT inbox persistence across reopened connections, no duplicate on repeated tick, WAIT without expression and concurrent player mutation rejecting stale publication. Existing 50 tests remain passing. ACT adds at most one expression call: up to three model calls per opportunity when life is due, within the existing eight-opportunity daily cap (not a token or monetary cap). Free-service sleep limitation unchanged. Deployment and natural live ACT observation are pending at this checkpoint.

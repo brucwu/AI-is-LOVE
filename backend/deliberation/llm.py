@@ -47,7 +47,7 @@ class LLMDeliberator:
                                        for e in runtime.life.recent_experiences[-4:]]},
             "previous_internal_decision": {"decision": runtime.autonomy.last_decision,
                 "reason": runtime.autonomy.last_reason, "intent": runtime.autonomy.proposed_intent,
-                "delivered": False},
+                "delivered": runtime.autonomy.last_delivery_id is not None and runtime.autonomy.last_decision == "ACT"},
             "recent_conversation": conversation_context(runtime),
             "character": asdict(runtime.profile),
             "relationship": asdict(runtime.relationship),

@@ -119,3 +119,44 @@ def test_cognition_receives_life_local_time_and_unsent_intent(tmp_path):
             assert p['previous_internal_decision']['delivered'] is False
             return dict(decision='WAIT',reason='她那邊已經很晚了',intent=None,next_wakeup_minutes=180)
     assert LLMDeliberator(Model()).deliberate(r).decision==Decision.WAIT
+
+
+def test_act_publishes_once_and_survives_restart(tmp_path):
+    url, life, mind = setup(tmp_path)
+    mind.deliberate = lambda r: DeliberationResult(Decision.ACT, '想分享', '分享散步', 60)
+    class Composer:
+        calls = 0
+        def proactive(self, runtime, now, intent):
+            self.calls += 1
+            assert intent == '分享散步'
+            return '剛和 Nina 約好散步，也想起你了。'
+    composer = Composer()
+    out = tick(url, NOW, life, mind, composer=composer, jitter=lambda a,b: 0)
+    assert out['delivery'] == 'inbox'
+    assert tick(url, NOW, life, mind, composer=composer)['status'] == 'waiting'
+    store = RuntimeStore(url); r, _ = store.load('mira'); store.close()
+    assert len(r.conversation) == 1 and composer.calls == 1
+    assert r.conversation[0].origin == 'mira' and r.conversation[0].player_text == ''
+    assert r.conversation[0].id == r.autonomy.last_delivery_id
+    assert r.conversation[0].reply == '剛和 Nina 約好散步，也想起你了。'
+
+
+def test_wait_never_calls_proactive_composer(tmp_path):
+    url, life, mind = setup(tmp_path)
+    class Composer:
+        def proactive(self, *args):
+            raise AssertionError('WAIT must not send')
+    assert tick(url, NOW, life, mind, composer=Composer())['delivery'] == 'none'
+
+
+def test_proactive_concurrent_player_update_discards_stale_message(tmp_path):
+    url, life, mind = setup(tmp_path)
+    mind.deliberate = lambda r: DeliberationResult(Decision.ACT, '想分享', '分享散步', 60)
+    class Composer:
+        def proactive(self, *args):
+            store = RuntimeStore(url); r, rev = store.load('mira')
+            r.mental.mood = '玩家剛聯絡'; store.save(r, rev); store.close()
+            return '舊訊息'
+    assert tick(url, NOW, life, mind, composer=Composer())['status'] == 'conflict'
+    store = RuntimeStore(url); r, _ = store.load('mira'); store.close()
+    assert r.mental.mood == '玩家剛聯絡' and not r.conversation

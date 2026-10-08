@@ -23,7 +23,7 @@ from backend.autonomy.loop import LifeLoop
 from backend.persistence.service import initialize_database
 from backend.persistence.store import RuntimeStore, ConflictError, encode
 
-app = FastAPI(title="AI is LOVE", version="0.7.0")
+app = FastAPI(title="AI is LOVE", version="0.8.0")
 logger = logging.getLogger("ai_is_love.behavior")
 PROCESS_ID = str(uuid4())
 
@@ -64,7 +64,7 @@ def start_life_loop():
     finally:
         store.close()
     app.state.life_loop = LifeLoop(os.environ["DATABASE_URL"], LLMLifeDirector(model),
-                                  LLMDeliberator(model), limit)
+                                  LLMDeliberator(model), limit, composer=ChatComposer(model))
     app.state.life_loop.start()
 
 

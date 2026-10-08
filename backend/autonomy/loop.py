@@ -7,6 +7,8 @@ Free Render sleep pauses this loop; missed opportunities are not replayed in bul
 import logging
 import random
 import threading
+from uuid import uuid4
+from backend.character.models import ChatTurn
 from datetime import datetime, timedelta, timezone
 
 from backend.persistence.store import RuntimeStore, ConflictError
@@ -14,7 +16,7 @@ from backend.persistence.store import RuntimeStore, ConflictError
 logger = logging.getLogger("ai_is_love.autonomy")
 
 
-def tick(url, now, director, deliberator, *, daily_limit=8, jitter=None):
+def tick(url, now, director, deliberator, *, daily_limit=8, jitter=None, composer=None):
     if now.tzinfo is None:
         raise ValueError("Timezone-aware clock required")
     now = now.astimezone(timezone.utc)
@@ -56,8 +58,18 @@ def tick(url, now, director, deliberator, *, daily_limit=8, jitter=None):
         runtime.advance_internal_time(now, elapsed)
         result = deliberator.deliberate(runtime)
         state.last_decision, state.last_reason = result.decision.value, result.reason
-        # A proposed ACT is internal state, not a sent message or a delivery queue.
+        # Save expression and cognition atomically; a stale snapshot never publishes.
         state.proposed_intent = result.intent if result.decision.value == "ACT" else None
+        state.last_delivery_id = None
+        delivery = "none"
+        if composer and state.proposed_intent and not any(t.reply is None for t in runtime.conversation):
+            text = composer.proactive(runtime, now, state.proposed_intent)
+            if not isinstance(text, str) or not text.strip() or len(text) > 4000:
+                raise ValueError("Invalid proactive expression")
+            message_id = str(uuid4())
+            runtime.conversation.append(ChatTurn(message_id, "", now, text.strip(), now, origin="mira"))
+            state.last_delivery_id = message_id
+            delivery = "inbox"
         minutes = max(30, min(360, result.next_wakeup_minutes + jitter(-15, 15)))
         state.next_wakeup_at = now + timedelta(minutes=minutes)
         try:
@@ -65,7 +77,7 @@ def tick(url, now, director, deliberator, *, daily_limit=8, jitter=None):
         except ConflictError:
             return {"status": "conflict", "delivery": "none"}
         payload = {"status": "advanced", "revision": revision,
-                   "decision": state.last_decision, "delivery": "none",
+                   "decision": state.last_decision, "delivery": delivery,
                    "life_advanced": event is not None,
                    "thread_id": event.thread_id if event else None,
                    "attempts_today": state.attempts_today,
@@ -77,9 +89,10 @@ def tick(url, now, director, deliberator, *, daily_limit=8, jitter=None):
 
 
 class LifeLoop:
-    def __init__(self, url, director, deliberator, daily_limit=8):
+    def __init__(self, url, director, deliberator, daily_limit=8, composer=None):
         self.url, self.director, self.deliberator = url, director, deliberator
         self.daily_limit = daily_limit
+        self.composer = composer
         self.stop_event = threading.Event()
         self.thread = threading.Thread(target=self.run, name="mira-life", daemon=True)
 
@@ -87,7 +100,7 @@ class LifeLoop:
         while not self.stop_event.is_set():
             try:
                 tick(self.url, datetime.now(timezone.utc), self.director,
-                     self.deliberator, daily_limit=self.daily_limit)
+                     self.deliberator, daily_limit=self.daily_limit, composer=self.composer)
             except Exception as error:
                 # Do not log connection strings or provider request headers.
                 logger.error("AUTONOMY_TICK_FAILED type=%s", type(error).__name__)

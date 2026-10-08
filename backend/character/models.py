@@ -137,6 +137,7 @@ class AutonomyState:
     last_decision: str | None = None
     last_reason: str | None = None
     proposed_intent: str | None = None
+    last_delivery_id: str | None = None
 
 
 @dataclass
@@ -148,3 +149,4 @@ class ChatTurn:
     replied_at: datetime | None = None
     lease_until: datetime | None = None
     owner: str | None = None
+    origin: str = "player"

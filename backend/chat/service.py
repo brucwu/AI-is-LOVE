@@ -28,7 +28,7 @@ SYSTEM = '''你是 Mira，正在和你喜歡的人聊天。直接用自然的台
 
 
 def conversation_context(runtime):
-    return [{'player': t.player_text, 'received_at': t.received_at.isoformat(),
+    return [{'origin': t.origin, 'player': t.player_text, 'received_at': t.received_at.isoformat(),
              'mira': t.reply, 'replied_at': t.replied_at.isoformat() if t.replied_at else None}
             for t in runtime.conversation[-20:]]
 
@@ -37,9 +37,13 @@ class ChatComposer:
     def __init__(self, model):
         self.model = model
 
-    def reply(self, runtime, now):
-        result = self.model.generate_json(system=SYSTEM, schema=REPLY_SCHEMA,
+    def proactive(self, runtime, now, intent):
+        return self.reply(runtime, now, intent=intent)
+
+    def reply(self, runtime, now, intent=None):
+        result = self.model.generate_json(system=SYSTEM + ('\n這次是你主動傳訊息，並非回覆玩家。依提供的意圖表達，不重複最近已傳的內容。' if intent else ''), schema=REPLY_SCHEMA,
             schema_name='chat_reply', payload={
+                'proactive_intent': intent,
                 'local_now': now.astimezone(ZoneInfo('America/Los_Angeles')).isoformat(),
                 'character': encode(runtime.profile), 'identity': encode(runtime.life.identity),
                 'relationship': encode(runtime.relationship),
@@ -130,6 +134,6 @@ def send_message(url, request_id, text, composer, now=None):
 
 
 def public_turn(turn):
-    return {'id': turn.id, 'player_text': turn.player_text,
+    return {'id': turn.id, 'origin': turn.origin, 'player_text': turn.player_text,
             'received_at': turn.received_at.isoformat(), 'reply': turn.reply,
             'replied_at': turn.replied_at.isoformat() if turn.replied_at else None}
