@@ -104,3 +104,18 @@ def test_old_snapshot_without_autonomy_restores_default(tmp_path):
         store.connection.execute("UPDATE character_snapshots SET payload=? WHERE character_id='mira'",(json.dumps(document),))
     r,_=store.load('mira');store.close()
     assert r.autonomy.next_wakeup_at is None and r.autonomy.attempts_today==0
+
+
+def test_cognition_receives_life_local_time_and_unsent_intent(tmp_path):
+    from backend.deliberation.llm import LLMDeliberator
+    url,life,mind=setup(tmp_path)
+    tick(url,NOW,life,mind)
+    store=RuntimeStore(url);r,_=store.load('mira');store.close()
+    class Model:
+        def generate_json(self, **kwargs):
+            p=kwargs['payload']
+            assert p['life_context']['recent_experiences'][-1]['summary']=='和 Nina 約好週末散步'
+            assert p['temporal_context']['local_now'].endswith('-07:00')
+            assert p['previous_internal_decision']['delivered'] is False
+            return dict(decision='WAIT',reason='她那邊已經很晚了',intent=None,next_wakeup_minutes=180)
+    assert LLMDeliberator(Model()).deliberate(r).decision==Decision.WAIT

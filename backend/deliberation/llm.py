@@ -1,5 +1,7 @@
 import json
 from dataclasses import asdict
+from datetime import datetime, timezone
+from zoneinfo import ZoneInfo
 from typing import Protocol
 
 from backend.character.models import Decision, DeliberationResult
@@ -33,7 +35,18 @@ class LLMDeliberator:
         self.model = model
 
     def deliberate(self, runtime) -> DeliberationResult:
+        now = runtime.mental.last_deliberated_at or datetime.now(timezone.utc)
+        if now.tzinfo is None:
+            now = now.replace(tzinfo=timezone.utc)  # Legacy test clocks.
         payload = {
+            "temporal_context": {"now": now.isoformat(),
+                "local_now": now.astimezone(ZoneInfo("America/Los_Angeles")).isoformat()},
+            "life_context": {"current_activity": runtime.life.current_activity,
+                "recent_experiences": [{**asdict(e), "occurred_at": e.occurred_at.isoformat()}
+                                       for e in runtime.life.recent_experiences[-4:]]},
+            "previous_internal_decision": {"decision": runtime.autonomy.last_decision,
+                "reason": runtime.autonomy.last_reason, "intent": runtime.autonomy.proposed_intent,
+                "delivered": False},
             "character": asdict(runtime.profile),
             "relationship": asdict(runtime.relationship),
             "mental_state": {
