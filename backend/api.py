@@ -16,10 +16,11 @@ from backend.deliberation.llm import LLMDeliberator
 from backend.models.openai import OpenAIStructuredModel
 from backend.life.director import LLMLifeDirector, serialize_experience, serialize_thread
 from backend.life.mira import mira_life_identity, mira_initial_threads
+from backend.autonomy.loop import LifeLoop
 from backend.persistence.service import initialize_database
 from backend.persistence.store import RuntimeStore, ConflictError, encode
 
-app = FastAPI(title="AI is LOVE", version="0.5.1")
+app = FastAPI(title="AI is LOVE", version="0.6.0")
 logger = logging.getLogger("ai_is_love.behavior")
 PROCESS_ID = str(uuid4())
 
@@ -32,6 +33,43 @@ def initialize_persistent_runtime():
         logger.warning("PERSISTENCE_VALIDATION %s", json.dumps(
             {**app.state.persistence, "process_id": PROCESS_ID,
              "commit_sha": os.getenv("RENDER_GIT_COMMIT")}, ensure_ascii=False))
+
+
+@app.on_event("startup")
+def start_life_loop():
+    app.state.life_loop = None
+    if os.getenv("AUTONOMY_ENABLED", "").lower() not in {"1", "true", "yes"}:
+        return
+    if not os.getenv("DATABASE_URL") or not os.getenv("RUNTIME_API_TOKEN"):
+        raise RuntimeError("Autonomy requires configured persistence and protected runtime access")
+    limit = int(os.getenv("AUTONOMY_DAILY_LIMIT", "8"))
+    if not 1 <= limit <= 24:
+        raise ValueError("Invalid autonomy budget")
+    from openai import OpenAI
+    model = OpenAIStructuredModel(client=OpenAI(timeout=60, max_retries=0))
+    store = RuntimeStore(os.environ["DATABASE_URL"])
+    try:
+        runtime, revision = store.load("mira")
+        state = runtime.autonomy
+        logger.warning("AUTONOMY_RESTORED %s", json.dumps({
+            "revision": revision, "attempts_today": state.attempts_today,
+            "next_wakeup_at": state.next_wakeup_at.isoformat() if state.next_wakeup_at else None,
+            "next_life_at": state.next_life_at.isoformat() if state.next_life_at else None,
+            "last_decision": state.last_decision,
+            "process_id": PROCESS_ID, "commit_sha": os.getenv("RENDER_GIT_COMMIT")
+        }))
+    finally:
+        store.close()
+    app.state.life_loop = LifeLoop(os.environ["DATABASE_URL"], LLMLifeDirector(model),
+                                  LLMDeliberator(model), limit)
+    app.state.life_loop.start()
+
+
+@app.on_event("shutdown")
+def stop_life_loop():
+    loop = getattr(app.state, "life_loop", None)
+    if loop:
+        loop.close()
 
 
 def authorize_runtime(authorization: str | None = Header(default=None)):

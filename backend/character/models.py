@@ -126,3 +126,14 @@ class LifeState:
     ongoing_threads: list[str] = field(default_factory=list)
     future_plans: list[str] = field(default_factory=list)
     recent_experiences: list[LivedExperience] = field(default_factory=list)
+
+
+@dataclass
+class AutonomyState:
+    next_wakeup_at: datetime | None = None
+    next_life_at: datetime | None = None
+    budget_day: str = ""
+    attempts_today: int = 0
+    last_decision: str | None = None
+    last_reason: str | None = None
+    proposed_intent: str | None = None
